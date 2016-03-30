@@ -1,0 +1,20 @@
+[core]
+	excludesfile = $HOME/.gitignore_global
+[credential]
+	helper = osxkeychain
+[user]
+	name = Oskar Sigvardsson
+	email = oskarsigvardsson@gmail.com
+[push]
+	default = simple
+[alias]
+	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --word-diff --branches --remotes --decorate
+	diff-staged = diff --cached
+	wd = diff --word-diff
+	dlast = diff --word-diff HEAD^ HEAD
+	amend = commit -a --amend --reuse-message=HEAD
+	lastmessage = commit --amend
+	co = checkout
+	pr = pull --rebase
+	fs = "!git fetch; git status"
+	ls-branch = log --pretty=medium --date=relative --abbrev-commit --graph --stat --word-diff --decorate

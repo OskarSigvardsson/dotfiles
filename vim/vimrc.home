@@ -1,0 +1,263 @@
+autocmd!
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" VUNDLE START
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'gmarik/Vundle.vim'
+
+Plugin 'tpope/vim-fugitive'
+Plugin 'L9'
+Plugin 'scrooloose/syntastic'
+Plugin 'vim-scripts/taglist.vim'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'tpope/vim-dispatch'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'OrangeT/vim-csharp'
+Plugin 'OmniSharp/omnisharp-vim'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'vim-scripts/BufOnly.vim'
+Plugin 'rizzatti/dash.vim'
+Plugin 'tpope/vim-surround' 
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'airblade/vim-gitgutter'
+
+" Colorschemes
+Plugin 'vim-scripts/obsidian2.vim'
+Plugin 'trevorrjohn/vim-obsidian'
+Plugin 'tomasr/molokai'
+Plugin 'fcevado/molokai_dark'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'whatyouhide/vim-gotham'
+Plugin 'NLKNguyen/papercolor-theme'
+
+"Plugin 'pyte'
+"Plugin 'oceanlight'
+
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" BASIC OPTIONS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Turn on syntax highlighting
+syntax on
+
+set number                " Show line numbers
+set autowrite             " Autowrite after commands
+set shiftwidth=4          " Number of indent spaces
+set expandtab             " Expand tabs to spaces
+set tabstop=4             " Number of spaces for a tab
+set smartindent           " Smart indentation when starting new line
+set hls                   " Highlight previous search
+set is                    " Highlight search incrementally
+set ruler                 " Ruler
+set cul                   " Highlight current line
+set scrolloff=5           " Show a few lines above and below when scrolling
+set ignorecase            " Ignore case when searching 
+set smartcase             " except if there's an uppercase character
+set splitright            " Split vertically to the right
+set showmatch             " Jump to matching bracket briefly
+set hidden				  " Hidden buffers don't need to be saved. 
+set lazyredraw			  " Don't redraw during macros
+set wildmenu			  " Better command autocompletion
+set display+=lastline     " Display as much as possible of last line
+set encoding=utf-8		  " Use UTF-8
+set formatoptions+=j	  " Remove comment character(s) when joining lines
+set formatoptions+=c	  " Autowrap comments
+set formatoptions-=ro     " Don't autoinsert comment characters after o or <Enter>
+set updatetime=500        " Wait before fetching type/symbol information 
+set laststatus=2          " Always show status line
+set showtabline=2         " Always show tabline 
+set noshowmode            " Don't display mode message (use airline instead)
+set completeopt-=preview " Don't show completion information in preview window
+set diffopt+=vertical     " Do diffs vertically
+
+"set splitbelow            " Split horizontally down
+"set autochdir			  " Automatically chdir when editing file
+
+" Set swp file directory to prevent .swp files from polluting the filesystem
+set backupdir=$HOME/.vim/swpfiles/
+set directory=$HOME/.vim/swpfiles/
+
+" Save undo information
+set undodir=$HOME/.vim-undo
+set undofile
+set undolevels=1000
+set undoreload=10000
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" LOOK OPTIONS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" It's all about that solarized dark
+colorscheme solarized
+set background=dark
+
+" Use a nice Powerline programming font
+set guifont=Inconsolata-g\ for\ Powerline:h15
+
+" Remove scrollbars from gui. 
+set guioptions-=r
+set guioptions-=R
+set guioptions-=l
+set guioptions-=L
+set guioptions-=b
+set guioptions-=e
+
+" Console instead of popup
+set guioptions+=c
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" KEY MAPPINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Comma is <leader>
+let mapleader = ","
+
+" Remove highlighting with backspace
+nmap <bs> :noh <CR>
+
+" Esc twice saves buffer in normal mode
+nnoremap <Esc><Esc> :w<CR>
+
+" Use space as an alias for : in normal mode
+nnoremap <space> :
+vnoremap <space> :
+
+" Enter moves a line down in normal mode
+nmap <CR> O<C-c>j
+
+" Move text using Alt+[jk]
+nmap √ mz:m+<cr>`z
+nmap ª mz:m-2<cr>`z
+vmap √ :m'>+<cr>`<my`>mzgv`yo`z
+vmap ª :m'<-2<cr>`>my`<mzgv`yo`z
+
+" Use jk to exit insertion mode
+inoremap jk <C-c>
+
+" Use arrow keys to move between window splits
+nnoremap <Left>  <C-w>h
+nnoremap <Right> <C-w>l
+nnoremap <Up>    <C-W>k
+nnoremap <Down>  <C-W>j
+inoremap <Left>  <Esc><C-w>h
+inoremap <Right> <Esc><C-w>l
+inoremap <Up>    <Esc><C-W>k
+inoremap <Down>  <Esc><C-W>j
+vnoremap <Left>  <Esc><C-w>h
+vnoremap <Right> <Esc><C-w>l
+vnoremap <Up>    <Esc><C-W>k
+vnoremap <Down>  <Esc><C-W>j
+
+
+" Use shift-left/right to move between buffers
+nnoremap <S-Left>  :bp<CR>
+nnoremap <S-Right> :bn<CR>
+
+" Change unimpaired forwards and backwards keys
+nmap ö [
+omap ö [
+xmap ö [
+nmap ä ]
+omap ä ]
+xmap ä ]
+
+" Ö/Ä cycles through quickfix list
+nmap Ö :cprev<CR>
+omap Ö :cprev<CR>
+xmap Ö :cprev<CR>
+nmap Ä :cnext<CR>
+omap Ä :cnext<CR>
+xmap Ä :cnext<CR>
+
+" Use <leader>rs to search repository for word under cursor (splits window)
+nnoremap <leader>rs "gyiw:vsp<CR>:exec ":Ggrep -wI --untracked" @g<CR><CR>
+
+" Use <leader>ss to do a quick search/replace
+nnoremap <leader>ss :%s///gc<left><left><left>
+
+" Use <leader>d to see current file diffs from repo 
+nnoremap <leader>cd :vsp<CR>:Glog<CR>:diffthis<CR>:winc h<CR>:diffthis<CR>
+
+" j/k scrolls screen lines instead of logical lines
+nnoremap j gj
+nnoremap k gk
+
+" Don't move the cursor after pasting
+nnoremap p p`[h
+nnoremap P P`[
+
+" <leader>i fixes indentation between {}
+"nnoremap <leader>i =i{
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CUSTOM COMMANDS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+:command! Vimrc :e ~/.vimrc
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" AUTOCMDS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set correct syntax highlighting
+au BufNewFile,BufRead *.pl set filetype=prolog
+au BufNewFile,BufRead *.md set filetype=markdown
+
+" Turn off expandtabs for certain filetypes
+au BufNewFile,BufRead makefile set noexpandtab
+au BufNewFile,BufRead *.cs set noexpandtab
+
+" Proper python indents on all important keywords
+au FileType python setlocal cinwords=if,elif,else,for,while,try,except,finally,def,class
+
+" Automatically open quickfix window after any grep
+au QuickFixCmdPre *grep* copen
+
+" For cs files, do omnisharp/syntastic check every time text changes
+autocmd CursorHold *.cs SyntasticCheck
+ 
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PLUGIN SETTINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Syntastic settings
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_cs_checkers = ['syntax', 'semantic']
+
+" OmniSharp settings
+autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+nmap <leader>ors :OmniSharpReloadSolution<CR>:SyntasticCheck<CR>
+
+" YouCompleteMe settings
+let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_show_diagnostics_ui = 0
+let g:ycm_key_list_select_completion = ['<TAB>', '<Down>', '<Enter>']
+let g:ycm_auto_trigger = 0
+let g:ycm_min_num_of_chars_for_completion = 5
+
+" CtrlP settings
+let g:ctrlp_map = '<c-p>'
+
+" Vim-Dash settings
+nmap <silent> <leader>d <Plug>DashSearch
+
+" Vim-airline
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
+
+
+
