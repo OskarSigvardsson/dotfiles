@@ -15,5 +15,6 @@ done
 # Run installer scripts
 for FILE in $( ls -d */ | sed 's|/$||' | xargs find | grep "install\.sh$" )
 do
+    echo "Running $FILE"
     sh $FILE
 done
