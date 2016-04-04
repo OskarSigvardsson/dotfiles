@@ -158,9 +158,17 @@ vnoremap <Up>    <Esc><C-W>k
 vnoremap <Down>  <Esc><C-W>j
 
 
-" Use shift-left/right to move between buffers
+" Use shift-arrow keys to manipulate buffers
 nnoremap <S-Left>  :bp<CR>
 nnoremap <S-Right> :bn<CR>
+nnoremap <S-Up>    :enew<CR>
+nnoremap <S-Down>  :bdel<CR>
+
+" Use ctrl-arrow keys to manipulate tabs
+nnoremap <C-Left>  :tabprevious<CR>
+nnoremap <C-Right> :tabnext<CR>
+nnoremap <C-Up>    :tabnew<CR>
+nnoremap <C-Down>  :tabclose<CR>
 
 " Change unimpaired forwards and backwards keys
 nmap ö [
@@ -237,7 +245,7 @@ let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_cs_checkers = ['syntax', 'semantic']
 
 " OmniSharp settings
-autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+"autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 nmap <leader>ors :OmniSharpReloadSolution<CR>:SyntasticCheck<CR>
 

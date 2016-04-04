@@ -17,4 +17,5 @@
 	co = checkout
 	pr = pull --rebase
 	fs = "!git fetch; git status"
+    fls = "!git fetch; git ls"
 	ls-branch = log --pretty=medium --date=relative --abbrev-commit --graph --stat --word-diff --decorate
