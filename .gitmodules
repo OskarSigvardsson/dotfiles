@@ -1,0 +1,3 @@
+[submodule "powerline-shell/powerline-shell"]
+	path = powerline-shell/powerline-shell
+	url = https://github.com/milkbikis/powerline-shell
