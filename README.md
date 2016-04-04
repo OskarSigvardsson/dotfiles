@@ -4,4 +4,6 @@ To install, clone into some folder, run ```./install.sh``` and then add this to 
 
     source ~/path/to/dotfiles/repo/bashrc.sh
 
-This adds the various bashrc scripts in the repo to your regular bashrc
+To make sure the various bashrc scripts in the repo runs when you log in. 
+
+Note that this does not install necessary packages, so you might have to do that manually. Also, Vim might throw some errors (like that YouCompleteMe has to be compiled manually), which you might have to fix on your own. 
