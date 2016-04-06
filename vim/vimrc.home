@@ -192,8 +192,11 @@ nnoremap <leader>rs "gyiw:vsp<CR>:exec ":Ggrep -wI --untracked" @g<CR><CR>
 " Use <leader>ss to do a quick search/replace
 nnoremap <leader>ss :%s///gc<left><left><left>
 
+" Edit vimrc
+nnoremap <leader>rc :Vimrc<cr>
+
 " Use <leader>d to see current file diffs from repo 
-nnoremap <leader>cd :vsp<CR>:Glog<CR>:diffthis<CR>:winc h<CR>:diffthis<CR>
+" nnoremap <leader>cd :vsp<CR>:Glog<CR>:diffthis<CR>:winc h<CR>:diffthis<CR>
 
 " j/k scrolls screen lines instead of logical lines
 nnoremap j gj
@@ -229,10 +232,6 @@ au FileType python setlocal cinwords=if,elif,else,for,while,try,except,finally,d
 " Automatically open quickfix window after any grep
 au QuickFixCmdPre *grep* copen
 
-" For cs files, do omnisharp/syntastic check every time text changes
-autocmd CursorHold *.cs SyntasticCheck
- 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -247,7 +246,9 @@ let g:syntastic_cs_checkers = ['syntax', 'semantic']
 " OmniSharp settings
 "autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-nmap <leader>ors :OmniSharpReloadSolution<CR>:SyntasticCheck<CR>
+nnoremap <leader>ors :OmniSharpReloadSolution<CR>:SyntasticCheck<CR>
+nnoremap <leader>otl :call OmniSharp#TypeLookupWithoutDocumentation()<CR>
+autocmd CursorHold *.cs SyntasticCheck
 
 " YouCompleteMe settings
 let g:ycm_add_preview_to_completeopt = 0
@@ -258,6 +259,8 @@ let g:ycm_min_num_of_chars_for_completion = 5
 
 " CtrlP settings
 let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_user_command = 'find %s -type f'
 
 " Vim-Dash settings
 nmap <silent> <leader>d <Plug>DashSearch
