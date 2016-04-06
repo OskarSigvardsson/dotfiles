@@ -1,7 +1,5 @@
 [core]
 	excludesfile = $HOME/.gitignore_global
-[credential]
-	helper = osxkeychain
 [user]
 	name = Oskar Sigvardsson
 	email = oskarsigvardsson@gmail.com
