@@ -1,9 +1,9 @@
-if which fortune > /dev/null
+if which fortune > /dev/null 2> /dev/null
 then
-    if which cowsay > /dev/null
+    if which cowsay > /dev/null 2> /dev/null
     then
-        fortune | cowsay
+        fortune -s | cowsay
     else
-        fortune
+        fortune -s
     fi
 fi
