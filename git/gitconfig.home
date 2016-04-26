@@ -6,7 +6,10 @@
 [push]
 	default = simple
 [alias]
-	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --word-diff --branches --remotes --decorate
+	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --branches --remotes --decorate
+	ls-branch = log --pretty=medium --date=relative --abbrev-commit --graph --stat --decorate
+    ls-short = "log --format=\"format:%C(yellow)%h %Cblue%ad %Cgreen%<(7)%aN%Cred%d %Creset%s\" --date=relative --graph --decorate --remotes --branches"
+    ls-short-branch = "log --format=\"format:%C(yellow)%h %Cblue%ad %Cgreen%<(7)%aN%Cred%d %Creset%s\" --date=relative --graph --decorate"
 	diff-staged = diff --cached
 	wd = diff --word-diff
 	dlast = diff --word-diff HEAD^ HEAD
@@ -16,4 +19,9 @@
 	pr = pull --rebase
 	fs = "!git fetch; git status"
     fls = "!git fetch; git ls"
-	ls-branch = log --pretty=medium --date=relative --abbrev-commit --graph --stat --word-diff --decorate
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
