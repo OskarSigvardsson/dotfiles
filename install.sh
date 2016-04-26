@@ -1,23 +1,33 @@
 #!/bin/sh
-GREEN="$(tput setaf 2)"
-BLUE="$(tput setaf 4)"
-RESET="$(tput sgr0)"
 
+source utils.sh
 
 # Link dotfiles
-echo "${GREEN}--> Linking dotfiles${RESET}"
-for FILE in $( find * | grep "\.home$" )
-do
-    DOTFILE=$( basename $FILE | sed "s/\(.*\)\.home$/.\1/" )
+level_echo "Linking dotfiles"
+increase_level
 
-    echo "${BLUE}---> $DOTFILE${RESET}"
-    ln -s -i "`pwd`/$FILE" "$HOME/$DOTFILE"
+for file in $( find * | grep "\.home$" )
+do
+    dotfile=$( basename $file | sed "s/\(.*\)\.home$/.\1/" )
+
+    source="`pwd`/$file" 
+    destination="$HOME/$dotfile"
+
+    link_file_prompt "$source" "$destination"
 done
+
+decrease_level
 
 # Run installer scripts
-echo "${GREEN}--> Run installer scripts${RESET}"
-for FILE in $( ls -d */ | sed 's|/$||' | xargs find | grep "install\.sh$" )
+level_echo "Run installer scripts"
+
+increase_level
+for file in $( ls -d */ | sed 's|/$||' | xargs -I{} find {} -maxdepth 1 | grep "install\.sh$" )
 do
-    echo "${BLUE}---> Running $FILE${RESET}"
-    sh $FILE
+    level_echo "Running $file"
+
+    increase_level
+    source $file
+    decrease_level
 done
+decrease_level

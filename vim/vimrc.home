@@ -97,11 +97,11 @@ set undoreload=10000
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " It's all about that solarized dark
 colorscheme solarized
-set background=light
+set background=dark
 
 " Use a nice Powerline programming font
 "set guifont=Droid\ Sans\ Mono\ Slashed\ for\ Powerline:h14
-set guifont=Droid\ Sans\ Mono\ Slashed\ for\ Powerline:h15
+set guifont=Droid\ Sans\ Mono\ Slashed\ for\ Powerline:h17
 
 " Remove scrollbars from gui. 
 set guioptions-=r
@@ -271,6 +271,4 @@ nmap <silent> <leader>d <Plug>DashSearch
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
-
-
-
+let g:airline_theme = "luna"
