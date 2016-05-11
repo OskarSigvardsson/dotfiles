@@ -1,0 +1,10 @@
+brew 'bash-completion'
+brew 'cowsay'
+brew 'fortune'
+brew 'imagemagick'
+brew 'irssi'
+brew 'python'
+brew 'python3'
+brew 'macvim', args: ['with-override-system-vim']
+brew 'node'
+brew 'wget'

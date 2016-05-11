@@ -14,7 +14,8 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'L9'
 Plugin 'scrooloose/syntastic'
-Plugin 'vim-scripts/taglist.vim'
+"Plugin 'vim-scripts/taglist.vim'
+Plugin 'majutsushi/tagbar'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-dispatch'
 Plugin 'tpope/vim-unimpaired'
@@ -59,7 +60,7 @@ set hls                   " Highlight previous search
 set is                    " Highlight search incrementally
 set ruler                 " Ruler
 set cul                   " Highlight current line
-set scrolloff=5           " Show a few lines above and below when scrolling
+set scrolloff=3           " Show a few lines above and below when scrolling
 set ignorecase            " Ignore case when searching 
 set smartcase             " except if there's an uppercase character
 set splitright            " Split vertically to the right
@@ -76,8 +77,10 @@ set updatetime=500        " Wait before fetching type/symbol information
 set laststatus=2          " Always show status line
 set showtabline=2         " Always show tabline 
 set noshowmode            " Don't display mode message (use airline instead)
-set completeopt-=preview " Don't show completion information in preview window
+set completeopt-=preview  " Don't show completion information in preview window
 set diffopt+=vertical     " Do diffs vertically
+set bs=start,eol,indent   " Fix backspace
+set confirm               " Ask for confirmation instead of failing for :q etc.
 
 "set splitbelow            " Split horizontally down
 "set autochdir			  " Automatically chdir when editing file
@@ -87,7 +90,7 @@ set backupdir=$HOME/.vim/swpfiles/
 set directory=$HOME/.vim/swpfiles/
 
 " Save undo information
-set undodir=$HOME/.vim-undo
+set undodir=$HOME/.vim/undo
 set undofile
 set undolevels=1000
 set undoreload=10000
@@ -95,12 +98,11 @@ set undoreload=10000
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" It's all about that solarized dark
+" It's all about that solarized 
 colorscheme solarized
-set background=dark
+set background=light
 
 " Use a nice Powerline programming font
-"set guifont=Droid\ Sans\ Mono\ Slashed\ for\ Powerline:h14
 set guifont=Droid\ Sans\ Mono\ Slashed\ for\ Powerline:h17
 
 " Remove scrollbars from gui. 
@@ -112,8 +114,7 @@ set guioptions-=b
 set guioptions-=e
 
 " Console instead of popup
-set guioptions+=c
-
+" set guioptions+=c
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KEY MAPPINGS
@@ -158,6 +159,12 @@ vnoremap <Right> <Esc><C-w>l
 vnoremap <Up>    <Esc><C-W>k
 vnoremap <Down>  <Esc><C-W>j
 
+if has("nvim") 
+    tnoremap <S-Left>  <C-\><C-n><C-w>h
+    tnoremap <S-Right> <C-\><C-n><C-w>l
+    tnoremap <S-Up>    <C-\><C-n><C-w>k
+    tnoremap <S-Down>  <C-\><C-n><C-w>j
+endif
 
 " Use shift-arrow keys to manipulate buffers
 nnoremap <S-Left>  :bp<CR>
@@ -188,7 +195,7 @@ omap Ä :cnext<CR>
 xmap Ä :cnext<CR>
 
 " Use <leader>rs to search repository for word under cursor (splits window)
-nnoremap <leader>rs "gyiw:vsp<CR>:exec ":Ggrep -wI --untracked" @g<CR><CR>
+nnoremap <leader>rs "gyiw:exec ":silent Ggrep -wI --untracked" @g<CR><CR>
 
 " Use <leader>ss to do a quick search/replace
 nnoremap <leader>ss :%s///gc<left><left><left>
@@ -209,6 +216,10 @@ nnoremap P P`[
 
 " <leader>i fixes indentation between {}
 "nnoremap <leader>i =i{
+
+if has("nvim")
+	nnoremap <leader>t :vsp<CR>:terminal<CR>
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CUSTOM COMMANDS
@@ -245,12 +256,16 @@ let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_cs_checkers = ['syntax', 'semantic']
 
 " OmniSharp settings
+let g:OmniSharp_timeout=3
 autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-nnoremap <leader>ors :OmniSharpReloadSolution<CR>:SyntasticCheck<CR>
-nnoremap <leader>otl :call OmniSharp#TypeLookupWithoutDocumentation()<CR>
-nnoremap <leader>ogd :OmniSharpGotoDefinition<CR>
 autocmd CursorHold *.cs SyntasticCheck
+autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+autocmd FileType cs nnoremap <leader>or :OmniSharpReloadSolution<CR>:OmniSharpBuild<CR>
+autocmd FileType cs nnoremap <leader>ot :OmniSharpFindType<CR>
+autocmd FileType cs nnoremap <leader>od :OmniSharpGotoDefinition<CR>
+autocmd FileType cs nnoremap <leader>ou :OmniSharpFindUsages<CR>
+autocmd FileType cs nnoremap <leader>oa :OmniSharpGetCodeActions<CR>
+autocmd FileType cs nnoremap <leader>on :OmniSharpRename<CR>
 
 " YouCompleteMe settings
 let g:ycm_add_preview_to_completeopt = 0
@@ -271,4 +286,4 @@ nmap <silent> <leader>d <Plug>DashSearch
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
-let g:airline_theme = "luna"
+let g:airline#extensions#tabline#formatter = 'unique_tail'
