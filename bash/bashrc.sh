@@ -7,3 +7,5 @@ then
         fortune -s
     fi
 fi
+
+source bash/aliases.sh

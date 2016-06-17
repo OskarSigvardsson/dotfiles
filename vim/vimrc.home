@@ -81,6 +81,7 @@ set completeopt-=preview  " Don't show completion information in preview window
 set diffopt+=vertical     " Do diffs vertically
 set bs=start,eol,indent   " Fix backspace
 set confirm               " Ask for confirmation instead of failing for :q etc.
+set nowrap                " Don't wrap lines
 
 "set splitbelow            " Split horizontally down
 "set autochdir			  " Automatically chdir when editing file
@@ -200,6 +201,10 @@ nnoremap <leader>rs "gyiw:exec ":silent Ggrep -wI --untracked" @g<CR><CR>
 " Use <leader>ss to do a quick search/replace
 nnoremap <leader>ss :%s///gc<left><left><left>
 
+" Select all
+nnoremap <leader>sa ggvG$
+vnoremap <leader>sa ggvG$
+
 " Edit vimrc
 nnoremap <leader>rc :Vimrc<cr>
 
@@ -256,16 +261,16 @@ let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_cs_checkers = ['syntax', 'semantic']
 
 " OmniSharp settings
-let g:OmniSharp_timeout=3
-autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-autocmd CursorHold *.cs SyntasticCheck
+let g:OmniSharp_timeout=10
 autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-autocmd FileType cs nnoremap <leader>or :OmniSharpReloadSolution<CR>:OmniSharpBuild<CR>
-autocmd FileType cs nnoremap <leader>ot :OmniSharpFindType<CR>
-autocmd FileType cs nnoremap <leader>od :OmniSharpGotoDefinition<CR>
-autocmd FileType cs nnoremap <leader>ou :OmniSharpFindUsages<CR>
-autocmd FileType cs nnoremap <leader>oa :OmniSharpGetCodeActions<CR>
-autocmd FileType cs nnoremap <leader>on :OmniSharpRename<CR>
+autocmd FileType cs nnoremap <leader>or  :OmniSharpAddToProject<CR>:OmniSharpReloadSolution<CR>:OmniSharpBuild<CR>
+autocmd FileType cs nnoremap <leader>ot  :OmniSharpFindType<CR>
+autocmd FileType cs nnoremap <leader>otl :call OmniSharp#TypeLookupWithoutDocumentation()<CR>
+autocmd FileType cs nnoremap <leader>od  :OmniSharpGotoDefinition<CR>
+autocmd FileType cs nnoremap <leader>ou  :OmniSharpFindUsages<CR>
+autocmd FileType cs nnoremap <leader>ous :OmniSharpFixUsings<CR>
+autocmd FileType cs nnoremap <leader>oa  :OmniSharpGetCodeActions<CR>
+autocmd FileType cs nnoremap <leader>on  :OmniSharpRename<CR>
 
 " YouCompleteMe settings
 let g:ycm_add_preview_to_completeopt = 0
