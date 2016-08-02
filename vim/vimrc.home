@@ -104,7 +104,7 @@ colorscheme solarized
 set background=light
 
 " Use a nice Powerline programming font
-set guifont=Droid\ Sans\ Mono\ Slashed\ for\ Powerline:h17
+set guifont=Source\ Code\ Pro\ for\ Powerline:h17
 
 " Remove scrollbars from gui. 
 set guioptions-=r
@@ -266,7 +266,7 @@ autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 autocmd FileType cs nnoremap <leader>or  :OmniSharpAddToProject<CR>:OmniSharpReloadSolution<CR>:OmniSharpBuild<CR>
 autocmd FileType cs nnoremap <leader>ot  :OmniSharpFindType<CR>
 autocmd FileType cs nnoremap <leader>otl :call OmniSharp#TypeLookupWithoutDocumentation()<CR>
-autocmd FileType cs nnoremap <leader>od  :OmniSharpGotoDefinition<CR>
+autocmd FileType cs nnoremap <leader>od  :vsp<CR>:OmniSharpGotoDefinition<CR>
 autocmd FileType cs nnoremap <leader>ou  :OmniSharpFindUsages<CR>
 autocmd FileType cs nnoremap <leader>ous :OmniSharpFixUsings<CR>
 autocmd FileType cs nnoremap <leader>oa  :OmniSharpGetCodeActions<CR>
