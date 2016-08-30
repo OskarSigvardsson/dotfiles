@@ -82,6 +82,7 @@ set diffopt+=vertical     " Do diffs vertically
 set bs=start,eol,indent   " Fix backspace
 set confirm               " Ask for confirmation instead of failing for :q etc.
 set nowrap                " Don't wrap lines
+set t_Co=256              " Number of colors, required for tmux
 
 "set splitbelow            " Split horizontally down
 "set autochdir			  " Automatically chdir when editing file
@@ -248,6 +249,9 @@ au FileType python setlocal cinwords=if,elif,else,for,while,try,except,finally,d
 
 " Automatically open quickfix window after any grep
 au QuickFixCmdPre *grep* copen
+
+" Javascript settings
+au FileType javascript,json setlocal ts=2 sw=2 expandtab
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
