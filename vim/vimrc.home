@@ -19,7 +19,7 @@ Plugin 'majutsushi/tagbar'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-dispatch'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'OrangeT/vim-csharp'
+"Plugin 'OrangeT/vim-csharp'
 Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-scripts/BufOnly.vim'
@@ -28,6 +28,10 @@ Plugin 'tpope/vim-surround'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'airblade/vim-rooter'
+Plugin 'tpope/vim-repeat'
+Plugin 'metakirby5/codi.vim'
+Plugin 'JamshedVesuna/vim-markdown-preview'
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
@@ -37,6 +41,8 @@ Plugin 'fcevado/molokai_dark'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'whatyouhide/vim-gotham'
 Plugin 'NLKNguyen/papercolor-theme'
+Plugin 'chriskempson/base16-vim'
+Plugin 'jacoborus/tender'
 
 "Plugin 'pyte'
 "Plugin 'oceanlight'
@@ -51,6 +57,7 @@ filetype plugin indent on    " required
 syntax on
 
 set number                " Show line numbers
+set relativenumber        " Show relative numbers, except on current line
 set autowrite             " Autowrite after commands
 set shiftwidth=4          " Number of indent spaces
 set expandtab             " Expand tabs to spaces
@@ -83,6 +90,7 @@ set bs=start,eol,indent   " Fix backspace
 set confirm               " Ask for confirmation instead of failing for :q etc.
 set nowrap                " Don't wrap lines
 set t_Co=256              " Number of colors, required for tmux
+set mouse=a	              " Enable mouse support
 
 "set splitbelow            " Split horizontally down
 "set autochdir			  " Automatically chdir when editing file
@@ -101,8 +109,18 @@ set undoreload=10000
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " It's all about that solarized 
-colorscheme solarized
-set background=light
+" Actually, lets try some base16 for a bit
+
+if $TERM_PROGRAM =~ "iTerm"
+    set termguicolors
+end
+
+if has("gui_running") || $TERM_PROGRAM =~ "iTerm"
+    colorscheme base16-atelier-estuary
+else
+    colorscheme solarized
+    set background=light
+end
 
 " Use a nice Powerline programming font
 set guifont=Source\ Code\ Pro\ for\ Powerline:h17
@@ -197,17 +215,20 @@ omap Ä :cnext<CR>
 xmap Ä :cnext<CR>
 
 " Use <leader>rs to search repository for word under cursor (splits window)
-nnoremap <leader>rs "gyiw:exec ":silent Ggrep -wI --untracked" @g<CR><CR>
+" nnoremap <leader>rs "gyiw:exec ":silent Ggrep -wI --untracked" @g<CR><CR>
 
 " Use <leader>ss to do a quick search/replace
 nnoremap <leader>ss :%s///gc<left><left><left>
 
 " Select all
 nnoremap <leader>sa ggvG$
-vnoremap <leader>sa ggvG$
 
 " Edit vimrc
-nnoremap <leader>rc :Vimrc<cr>
+" nnoremap <leader>rc :Vimrc<cr>
+
+" Search for word with :grep
+nnoremap <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>  
+nnoremap <leader>* :silent execute "grep " . expand("<cword>")<CR>
 
 " Use <leader>d to see current file diffs from repo 
 " nnoremap <leader>cd :vsp<CR>:Glog<CR>:diffthis<CR>:winc h<CR>:diffthis<CR>
@@ -228,10 +249,11 @@ if has("nvim")
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CUSTOM COMMANDS
+" COMMAND CUSTOMIZATIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 :command! Vimrc :e ~/.vimrc
+:set grepprg=rg\ --vimgrep\ --smart-case\ --word-regexp
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " AUTOCMDS
@@ -286,7 +308,7 @@ let g:ycm_min_num_of_chars_for_completion = 1
 " CtrlP settings
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_user_command = 'find %s -type f -name "*.cs"'
+autocmd FileType cs let g:ctrlp_user_command = 'find %s -type f -name "*.cs"'
 
 " Vim-Dash settings
 nmap <silent> <leader>d <Plug>DashSearch
@@ -296,3 +318,6 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
 let g:airline#extensions#tabline#formatter = 'unique_tail'
+
+" Markdown preview
+let vim_markdown_preview_github=1

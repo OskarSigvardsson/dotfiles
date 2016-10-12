@@ -9,3 +9,5 @@ then
 fi
 
 source bash/aliases.sh
+
+set PATH=$PATH:$HOME/.cargo/bin

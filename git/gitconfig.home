@@ -1,5 +1,5 @@
 [core]
-	excludesfile = $HOME/.gitignore_global
+	excludesfile = ~/.gitignore_global
 [user]
 	name = Oskar Sigvardsson
 	email = oskarsigvardsson@gmail.com
