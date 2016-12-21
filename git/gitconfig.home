@@ -4,26 +4,26 @@
 	name = Oskar Sigvardsson
 	email = oskarsigvardsson@gmail.com
 [alias]
-	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --branches --remotes --decorate
-	ls-branch = log --pretty=medium --date=relative --abbrev-commit --graph --stat --decorate
-    ls-short = "log --format=\"format:%C(yellow)%h %Cblue%ad %Cgreen%<(7)%aN%Cred%d %Creset%s\" --date=relative --graph --decorate --remotes --branches"
-    ls-short-branch = "log --format=\"format:%C(yellow)%h %Cblue%ad %Cgreen%<(7)%aN%Cred%d %Creset%s\" --date=relative --graph --decorate"
-	diff-staged = diff --cached
+	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --decorate
+	ls-all = log --pretty=medium --date=relative --abbrev-commit --graph --stat --branches --remotes --decorate
+    ls-short = "log --format=\"format:%C(yellow)%h %Cblue%ad %Cgreen%<(7)%aN%Cred%d %Creset%s\" --date=relative --graph --decorate"
+    ls-short-all = "log --format=\"format:%C(yellow)%h %Cblue%ad %Cgreen%<(7)%aN%Cred%d %Creset%s\" --date=relative --graph --decorate --remotes --branches"
 	wd = diff --word-diff
 	dlast = diff --word-diff HEAD^ HEAD
-	amend = commit -a --amend --reuse-message=HEAD
+	amend = commit --amend --reuse-message=HEAD
 	lastmessage = commit --amend
 	co = checkout
-	pr = pull --rebase
+	pr = pull --rebase --all
 	fs = "!git fetch; git status"
     fls = "!git fetch; git ls"
+    merge-test = "!git merge --no-commit \"$1\" && git merge --abort"
+[push]
+	default = matching
+[init]
+	templatedir = ~/.git_template
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
-[push]
-	default = matching
-[init]
-	templatedir = ~/.git_template

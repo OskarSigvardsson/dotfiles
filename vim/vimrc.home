@@ -11,15 +11,16 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
+Plugin 'vim-scripts/ShaderHighLight'
 Plugin 'tpope/vim-fugitive'
 Plugin 'L9'
 Plugin 'scrooloose/syntastic'
-"Plugin 'vim-scripts/taglist.vim'
+Plugin 'vim-scripts/taglist.vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-dispatch'
 Plugin 'tpope/vim-unimpaired'
-"Plugin 'OrangeT/vim-csharp'
+Plugin 'OrangeT/vim-csharp'
 Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-scripts/BufOnly.vim'
@@ -32,6 +33,12 @@ Plugin 'airblade/vim-rooter'
 Plugin 'tpope/vim-repeat'
 Plugin 'metakirby5/codi.vim'
 Plugin 'JamshedVesuna/vim-markdown-preview'
+"Plugin 'tsaleh/vim-supertab'
+Plugin 'ervandew/supertab'
+Plugin 'rust-lang/rust.vim'
+Plugin 'chreekat/vimin'
+Plugin 'junegunn/goyo.vim'
+Plugin 'vimwiki/vimwiki'
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
@@ -43,6 +50,7 @@ Plugin 'whatyouhide/vim-gotham'
 Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'chriskempson/base16-vim'
 Plugin 'jacoborus/tender'
+Plugin 'qualiabyte/vim-colorstepper'
 
 "Plugin 'pyte'
 "Plugin 'oceanlight'
@@ -58,7 +66,7 @@ syntax on
 
 set number                " Show line numbers
 set relativenumber        " Show relative numbers, except on current line
-set autowrite             " Autowrite after commands
+"set autowrite             " Autowrite after commands
 set shiftwidth=4          " Number of indent spaces
 set expandtab             " Expand tabs to spaces
 set tabstop=4             " Number of spaces for a tab
@@ -66,7 +74,8 @@ set smartindent           " Smart indentation when starting new line
 set hls                   " Highlight previous search
 set is                    " Highlight search incrementally
 set ruler                 " Ruler
-set cul                   " Highlight current line
+set cursorline            " Highlight current line
+set cursorcolumn          " Highlight current line
 set scrolloff=3           " Show a few lines above and below when scrolling
 set ignorecase            " Ignore case when searching 
 set smartcase             " except if there's an uppercase character
@@ -105,25 +114,28 @@ set undofile
 set undolevels=1000
 set undoreload=10000
 
+" View dir
+set viewdir=$HOME/.vim/view
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" It's all about that solarized 
-" Actually, lets try some base16 for a bit
+
+colorscheme base16-atelier-estuary
 
 if $TERM_PROGRAM =~ "iTerm"
     set termguicolors
 end
-
-if has("gui_running") || $TERM_PROGRAM =~ "iTerm"
-    colorscheme base16-atelier-estuary
-else
-    colorscheme solarized
-    set background=light
-end
+"
+"if has("gui_running") || $TERM_PROGRAM =~ "iTerm"
+"else
+"    colorscheme solarized
+"    set background=light
+"end
 
 " Use a nice Powerline programming font
-set guifont=Source\ Code\ Pro\ for\ Powerline:h17
+let g:default_font="Source\\ Code\\ Pro\\ for\\ Powerline:h17"
+execute "set guifont=".g:default_font
 
 " Remove scrollbars from gui. 
 set guioptions-=r
@@ -150,17 +162,20 @@ nmap <bs> :noh <CR>
 nnoremap <Esc><Esc> :w<CR>
 
 " Use space as an alias for : in normal mode
-nnoremap <space> :
-vnoremap <space> :
+nnoremap <Space> :
+vnoremap <Space> :
 
 " Enter moves a line down in normal mode
 nmap <CR> O<C-c>j
 
+" Delete clears a line
+nmap <Del> cc<Esc>
+
 " Move text using Alt+[jk]
-nmap √ mz:m+<cr>`z
-nmap ª mz:m-2<cr>`z
-vmap √ :m'>+<cr>`<my`>mzgv`yo`z
-vmap ª :m'<-2<cr>`>my`<mzgv`yo`z
+nmap √ mz:m+<Cr>`z
+nmap ª mz:m-2<Cr>`z
+vmap ª :m'<-2<Cr>`>my`<mzgv`zo`y
+vmap √ :m'>+<Cr>`<my`>mzgv`yo`z
 
 " Use jk to exit insertion mode
 inoremap jk <C-c>
@@ -206,13 +221,17 @@ nmap ä ]
 omap ä ]
 xmap ä ]
 
-" Ö/Ä cycles through quickfix list
-nmap Ö :cprev<CR>
-omap Ö :cprev<CR>
-xmap Ö :cprev<CR>
-nmap Ä :cnext<CR>
-omap Ä :cnext<CR>
-xmap Ä :cnext<CR>
+" Ö/Ä goes up/down a few lines
+nmap Ö 5k
+omap Ö 5k
+xmap Ö 5k
+nmap Ä 5j
+omap Ä 5j
+xmap Ä 5j
+
+" Keypad +/- goes up/down the quickfix list
+nnoremap <kMinus> :cprev<CR>
+nnoremap <kPlus>  :cnext<CR>
 
 " Use <leader>rs to search repository for word under cursor (splits window)
 " nnoremap <leader>rs "gyiw:exec ":silent Ggrep -wI --untracked" @g<CR><CR>
@@ -222,9 +241,6 @@ nnoremap <leader>ss :%s///gc<left><left><left>
 
 " Select all
 nnoremap <leader>sa ggvG$
-
-" Edit vimrc
-" nnoremap <leader>rc :Vimrc<cr>
 
 " Search for word with :grep
 nnoremap <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>  
@@ -252,7 +268,7 @@ endif
 " COMMAND CUSTOMIZATIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-:command! Vimrc :e ~/.vimrc
+:command! Rc :e ~/.vimrc
 :set grepprg=rg\ --vimgrep\ --smart-case\ --word-regexp
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -274,6 +290,10 @@ au QuickFixCmdPre *grep* copen
 
 " Javascript settings
 au FileType javascript,json setlocal ts=2 sw=2 expandtab
+
+" make views
+au BufWinLeave *.* mkview!
+au BufWinEnter *.* silent loadview
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
@@ -321,3 +341,6 @@ let g:airline#extensions#tabline#formatter = 'unique_tail'
 
 " Markdown preview
 let vim_markdown_preview_github=1
+
+" Vim-wiki
+let g:vimwiki_list = [{'path': '~/Dropbox/Wiki/Source', 'path_html': '~/Dropbox/Wiki/HTML'}]
