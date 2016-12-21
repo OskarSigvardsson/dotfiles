@@ -125,6 +125,8 @@ colorscheme base16-atelier-estuary
 
 if $TERM_PROGRAM =~ "iTerm"
     set termguicolors
+else 
+    colorscheme solarized
 end
 "
 "if has("gui_running") || $TERM_PROGRAM =~ "iTerm"
