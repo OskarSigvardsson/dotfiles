@@ -51,6 +51,7 @@ Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'chriskempson/base16-vim'
 Plugin 'jacoborus/tender'
 Plugin 'qualiabyte/vim-colorstepper'
+Plugin 'morhetz/gruvbox'
 
 "Plugin 'pyte'
 "Plugin 'oceanlight'
@@ -121,19 +122,12 @@ set viewdir=$HOME/.vim/view
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-colorscheme base16-atelier-estuary
+let g:gruvbox_italic=1
+set termguicolors
+colorscheme gruvbox
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
-if $TERM_PROGRAM =~ "iTerm"
-    set termguicolors
-else 
-    colorscheme solarized
-end
-"
-"if has("gui_running") || $TERM_PROGRAM =~ "iTerm"
-"else
-"    colorscheme solarized
-"    set background=light
-"end
 
 " Use a nice Powerline programming font
 let g:default_font="Source\\ Code\\ Pro\\ for\\ Powerline:h17"
