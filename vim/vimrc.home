@@ -11,7 +11,6 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
-Plugin 'vim-scripts/ShaderHighLight'
 Plugin 'tpope/vim-fugitive'
 Plugin 'L9'
 Plugin 'scrooloose/syntastic'
@@ -39,6 +38,9 @@ Plugin 'rust-lang/rust.vim'
 Plugin 'chreekat/vimin'
 Plugin 'junegunn/goyo.vim'
 Plugin 'vimwiki/vimwiki'
+Plugin 'vim-scripts/ShaderHighLight'
+Plugin 'itchyny/vim-cursorword'
+
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
@@ -50,7 +52,7 @@ Plugin 'whatyouhide/vim-gotham'
 Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'chriskempson/base16-vim'
 Plugin 'jacoborus/tender'
-Plugin 'qualiabyte/vim-colorstepper'
+"Plugin 'qualiabyte/vim-colorstepper'
 Plugin 'morhetz/gruvbox'
 
 "Plugin 'pyte'
@@ -250,15 +252,11 @@ nnoremap j gj
 nnoremap k gk
 
 " Don't move the cursor after pasting
-nnoremap p p`[h
-nnoremap P P`[
+"nnoremap p p`[h
+"nnoremap P P`[
 
-" <leader>i fixes indentation between {}
-"nnoremap <leader>i =i{
-
-if has("nvim")
-	nnoremap <leader>t :vsp<CR>:terminal<CR>
-endif
+" Replace current word with latest yank (mnemonic "stamp word"),
+nnoremap S mzviw"0p`z
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COMMAND CUSTOMIZATIONS
@@ -288,8 +286,8 @@ au QuickFixCmdPre *grep* copen
 au FileType javascript,json setlocal ts=2 sw=2 expandtab
 
 " make views
-au BufWinLeave *.* mkview!
-au BufWinEnter *.* silent loadview
+au BufWinLeave *.cs mkview!
+au BufWinEnter *.cs silent loadview
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
@@ -340,3 +338,4 @@ let vim_markdown_preview_github=1
 
 " Vim-wiki
 let g:vimwiki_list = [{'path': '~/Dropbox/Wiki/Source', 'path_html': '~/Dropbox/Wiki/HTML'}]
+au BufWinEnter *.wiki setlocal shiftwidth=2 tabstop=2 expandtab
