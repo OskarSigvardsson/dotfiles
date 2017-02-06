@@ -35,11 +35,11 @@ Plugin 'JamshedVesuna/vim-markdown-preview'
 "Plugin 'tsaleh/vim-supertab'
 Plugin 'ervandew/supertab'
 Plugin 'rust-lang/rust.vim'
-Plugin 'chreekat/vimin'
 Plugin 'junegunn/goyo.vim'
 Plugin 'vimwiki/vimwiki'
 Plugin 'vim-scripts/ShaderHighLight'
-Plugin 'itchyny/vim-cursorword'
+"Plugin 'itchyny/vim-cursorword'
+Plugin 'rdnetto/YCM-Generator'
 
 
 " Colorschemes
@@ -124,16 +124,17 @@ set viewdir=$HOME/.vim/view
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+
+if has('gui') 
+	set guifont=Source\ Code\ Pro\ for\ Powerline:h16
+	set guifont=Operator\ Mono\ XLight:h16
+    set macligatures
+endif
+
 set termguicolors
-colorscheme gruvbox
+colorscheme base16-atelier-estuary
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-
-
-" Use a nice Powerline programming font
-let g:default_font="Source\\ Code\\ Pro\\ for\\ Powerline:h17"
-execute "set guifont=".g:default_font
-
 " Remove scrollbars from gui. 
 set guioptions-=r
 set guioptions-=R
@@ -144,6 +145,7 @@ set guioptions-=e
 
 " Console instead of popup
 " set guioptions+=c
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KEY MAPPINGS
@@ -177,20 +179,6 @@ vmap √ :m'>+<Cr>`<my`>mzgv`yo`z
 " Use jk to exit insertion mode
 inoremap jk <C-c>
 
-" Use arrow keys to move between window splits
-nnoremap <Left>  <C-w>h
-nnoremap <Right> <C-w>l
-nnoremap <Up>    <C-W>k
-nnoremap <Down>  <C-W>j
-inoremap <Left>  <Esc><C-w>h
-inoremap <Right> <Esc><C-w>l
-inoremap <Up>    <Esc><C-W>k
-inoremap <Down>  <Esc><C-W>j
-vnoremap <Left>  <Esc><C-w>h
-vnoremap <Right> <Esc><C-w>l
-vnoremap <Up>    <Esc><C-W>k
-vnoremap <Down>  <Esc><C-W>j
-
 if has("nvim") 
     tnoremap <S-Left>  <C-\><C-n><C-w>h
     tnoremap <S-Right> <C-\><C-n><C-w>l
@@ -198,17 +186,28 @@ if has("nvim")
     tnoremap <S-Down>  <C-\><C-n><C-w>j
 endif
 
+" Use arrow keys to move between window splits
+nnoremap <Left>  <C-w>h
+nnoremap <Right> <C-w>l
+nnoremap <Up>    <C-W>k
+nnoremap <Down>  <C-W>j
+
 " Use shift-arrow keys to manipulate buffers
 nnoremap <S-Left>  :bp<CR>
 nnoremap <S-Right> :bn<CR>
 nnoremap <S-Up>    :enew<CR>
-nnoremap <S-Down>  :bdel<CR>
+nnoremap <S-Down>  :execute "bdel " . bufnr('%')<CR>
 
-" Use ctrl-arrow keys to manipulate tabs
-nnoremap <C-Left>  :tabprevious<CR>
-nnoremap <C-Right> :tabnext<CR>
-nnoremap <C-Up>    :tabnew<CR>
-nnoremap <C-Down>  :tabclose<CR>
+autocmd FileType netrw nnoremap <buffer> <S-Left>  :bp<CR>
+autocmd FileType netrw nnoremap <buffer> <S-Right> :bn<CR>
+autocmd FileType netrw nnoremap <buffer> <S-Up>    :enew<CR>
+autocmd FileType netrw nnoremap <buffer> <S-Down>  :execute "bdel " . bufnr('%')<CR>
+
+" Use ctrl-arrow keys to move windows
+nnoremap <C-Left>  <C-W>H
+nnoremap <C-Right> <C-W>L
+nnoremap <C-Up>    <C-W>K
+nnoremap <C-Down>  <C-W>J
 
 " Change unimpaired forwards and backwards keys
 nmap ö [
@@ -218,20 +217,24 @@ nmap ä ]
 omap ä ]
 xmap ä ]
 
-" Ö/Ä goes up/down a few lines
-nmap Ö 5k
-omap Ö 5k
-xmap Ö 5k
-nmap Ä 5j
-omap Ä 5j
-xmap Ä 5j
+" Ö/Ä goes up/down to previous/next empty line
+" maybe replace these...
+nnoremap Ö {
+xnoremap Ö {
+nnoremap Ä }
+xnoremap Ä }
+
+" +/- goes through change list
+nnoremap + g,
+nnoremap - g;
 
 " Keypad +/- goes up/down the quickfix list
 nnoremap <kMinus> :cprev<CR>
 nnoremap <kPlus>  :cnext<CR>
 
-" Use <leader>rs to search repository for word under cursor (splits window)
-" nnoremap <leader>rs "gyiw:exec ":silent Ggrep -wI --untracked" @g<CR><CR>
+" Shift Keypad +/- goes up/down the location list
+nnoremap <S-kMinus> :lprev<CR>
+nnoremap <S-kPlus>  :lnext<CR>
 
 " Use <leader>ss to do a quick search/replace
 nnoremap <leader>ss :%s///gc<left><left><left>
@@ -240,11 +243,7 @@ nnoremap <leader>ss :%s///gc<left><left><left>
 nnoremap <leader>sa ggvG$
 
 " Search for word with :grep
-nnoremap <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>  
-nnoremap <leader>* :silent execute "grep " . expand("<cword>")<CR>
-
-" Use <leader>d to see current file diffs from repo 
-" nnoremap <leader>cd :vsp<CR>:Glog<CR>:diffthis<CR>:winc h<CR>:diffthis<CR>
+nnoremap <silent> <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>  
 
 " j/k scrolls screen lines instead of logical lines
 nnoremap j gj
@@ -257,36 +256,44 @@ nnoremap k gk
 " Replace current word with latest yank (mnemonic "stamp word"),
 nnoremap S mzviw"0p`z
 
+" Paste and bump first digit. Takes a count. 
+nnoremap <silent> § :normal pyy<CR>:silent! call repeat#set("§", v:count)<CR>'[
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COMMAND CUSTOMIZATIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-:command! Rc :e ~/.vimrc
-:set grepprg=rg\ --vimgrep\ --smart-case\ --word-regexp
+command! Rc :e ~/.vimrc
+command! SyntaxGroup echo synIDattr(synID(line("."),col("."),0),"name")
+set grepprg=rg\ --vimgrep\ --smart-case\ --word-regexp
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " AUTOCMDS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Set correct syntax highlighting
-au BufNewFile,BufRead *.pl set filetype=prolog
-au BufNewFile,BufRead *.md set filetype=markdown
+autocmd BufNewFile,BufRead *.pl set filetype=prolog
+autocmd BufNewFile,BufRead *.md set filetype=markdown
 
 " Turn off expandtabs for certain filetypes
-au BufNewFile,BufRead makefile set noexpandtab
-au BufNewFile,BufRead *.cs set noexpandtab
+autocmd BufNewFile,BufRead makefile set noexpandtab
+autocmd BufNewFile,BufRead *.cs set noexpandtab
 
 " Proper python indents on all important keywords
-au FileType python setlocal cinwords=if,elif,else,for,while,try,except,finally,def,class
+autocmd FileType python setlocal cinwords=if,elif,else,for,while,try,except,finally,def,class
 
 " Automatically open quickfix window after any grep
-au QuickFixCmdPre *grep* copen
+autocmd QuickFixCmdPre *grep* copen
 
 " Javascript settings
-au FileType javascript,json setlocal ts=2 sw=2 expandtab
+autocmd FileType javascript,json setlocal ts=2 sw=2 expandtab
 
 " make views
-au BufWinLeave *.cs mkview!
-au BufWinEnter *.cs silent loadview
+"autocmd BufWinLeave *.cs mkview!
+"autocmd BufWinEnter *.cs silent loadview
+
+" Better help
+autocmd FileType help nnoremap <buffer> <CR> <C-]>
+autocmd FileType help nnoremap <buffer> <BS> <C-T>
+autocmd FileType help wincmd L
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
@@ -317,17 +324,26 @@ let g:ycm_show_diagnostics_ui = 0
 let g:ycm_key_list_select_completion = ['<TAB>', '<Down>', '<Enter>']
 let g:ycm_auto_trigger = 1
 let g:ycm_min_num_of_chars_for_completion = 1
+let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
 
 " CtrlP settings
-let g:ctrlp_map = '<c-p>'
+let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
-autocmd FileType cs let g:ctrlp_user_command = 'find %s -type f -name "*.cs"'
+let g:ctrlp_user_command = ['.git', 'cd %s && rg --files-with-matches ".*"', 'find %s -type f']
+au FileType cs let g:ctrlp_user_command = ['.git', 'cd %s && rg --files-with-matches ".*" --glob "*.cs"', 'find %s -type f']
 
 " Vim-Dash settings
 nmap <silent> <leader>d <Plug>DashSearch
 
 " Vim-airline
-let g:airline_powerline_fonts = 1
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+let g:airline_powerline_fonts = 0
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline_symbols.branch = '⎇'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
 let g:airline#extensions#tabline#formatter = 'unique_tail'
@@ -337,4 +353,8 @@ let vim_markdown_preview_github=1
 
 " Vim-wiki
 let g:vimwiki_list = [{'path': '~/Dropbox/Wiki/Source', 'path_html': '~/Dropbox/Wiki/HTML'}]
-au BufWinEnter *.wiki setlocal shiftwidth=2 tabstop=2 expandtab
+autocmd BufWinEnter *.wiki setlocal shiftwidth=2 tabstop=2 expandtab
+
+" Tagbar
+nnoremap <silent> T :TagbarToggle<CR>
+let g:tagbar_sort = 0
