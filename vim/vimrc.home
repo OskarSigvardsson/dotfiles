@@ -133,6 +133,7 @@ endif
 
 set termguicolors
 colorscheme base16-atelier-estuary
+
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 " Remove scrollbars from gui. 
@@ -217,16 +218,15 @@ nmap ä ]
 omap ä ]
 xmap ä ]
 
-" Ö/Ä goes up/down to previous/next empty line
-" maybe replace these...
-nnoremap Ö {
-xnoremap Ö {
-nnoremap Ä }
-xnoremap Ä }
-
-" +/- goes through change list
-nnoremap + g,
-nnoremap - g;
+" Make Ö/Ä go thorugh whitespace lines
+" ({ and } don't work like they should, they skip lines that are only
+" whitespace)
+nnoremap Ö :call search('\v^\s*$', 'sb')<CR>
+onoremap Ö :call search('\v^\s*$', 'sb')<CR>
+xnoremap Ö :call search('\v^\s*$', 'sb')<CR>
+nnoremap Ä :call search('\v^\s*$', 's')<CR>
+onoremap Ä :call search('\v^\s*$', 's')<CR>
+xnoremap Ä :call search('\v^\s*$', 's')<CR>
 
 " Keypad +/- goes up/down the quickfix list
 nnoremap <kMinus> :cprev<CR>
