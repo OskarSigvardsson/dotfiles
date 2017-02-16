@@ -9,5 +9,6 @@ then
 fi
 
 source bash/aliases.sh
+source bash/bash-powerline/bash-powerline.sh
 
 set PATH=$PATH:$HOME/.cargo/bin
