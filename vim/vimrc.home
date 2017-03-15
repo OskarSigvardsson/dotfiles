@@ -33,14 +33,14 @@ Plugin 'tpope/vim-repeat'
 Plugin 'metakirby5/codi.vim'
 Plugin 'JamshedVesuna/vim-markdown-preview'
 "Plugin 'tsaleh/vim-supertab'
-Plugin 'ervandew/supertab'
+"Plugin 'ervandew/supertab'
 Plugin 'rust-lang/rust.vim'
 Plugin 'junegunn/goyo.vim'
 Plugin 'vimwiki/vimwiki'
 Plugin 'vim-scripts/ShaderHighLight'
 "Plugin 'itchyny/vim-cursorword'
 Plugin 'rdnetto/YCM-Generator'
-
+Plugin 'Shougo/echodoc.vim'
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
@@ -67,42 +67,55 @@ filetype plugin indent on    " required
 " Turn on syntax highlighting
 syntax on
 
-set number                " Show line numbers
-set relativenumber        " Show relative numbers, except on current line
-"set autowrite             " Autowrite after commands
-set shiftwidth=4          " Number of indent spaces
-set expandtab             " Expand tabs to spaces
-set tabstop=4             " Number of spaces for a tab
-set smartindent           " Smart indentation when starting new line
-set hls                   " Highlight previous search
-set is                    " Highlight search incrementally
-set ruler                 " Ruler
-set cursorline            " Highlight current line
-set cursorcolumn          " Highlight current line
-set scrolloff=3           " Show a few lines above and below when scrolling
-set ignorecase            " Ignore case when searching 
-set smartcase             " except if there's an uppercase character
-set splitright            " Split vertically to the right
-set showmatch             " Jump to matching bracket briefly
-set hidden				  " Hidden buffers don't need to be saved. 
-set lazyredraw			  " Don't redraw during macros
-set wildmenu			  " Better command autocompletion
-set display+=lastline     " Display as much as possible of last line
-set encoding=utf-8		  " Use UTF-8
-set formatoptions+=j	  " Remove comment character(s) when joining lines
-set formatoptions+=c	  " Autowrap comments
-set formatoptions-=ro     " Don't autoinsert comment characters after o or <Enter>
-set updatetime=500        " Wait before fetching type/symbol information 
-set laststatus=2          " Always show status line
-set showtabline=2         " Always show tabline 
-set noshowmode            " Don't display mode message (use airline instead)
-set completeopt-=preview  " Don't show completion information in preview window
-set diffopt+=vertical     " Do diffs vertically
-set bs=start,eol,indent   " Fix backspace
-set confirm               " Ask for confirmation instead of failing for :q etc.
-set nowrap                " Don't wrap lines
-set t_Co=256              " Number of colors, required for tmux
-set mouse=a	              " Enable mouse support
+set number                  " Show line numbers
+set relativenumber          " Show relative numbers, except on current line
+"set autowrite               " Autowrite after commands
+set shiftwidth=4            " Number of indent spaces
+set expandtab               " Expand tabs to spaces
+set tabstop=4               " Number of spaces for a tab
+set smartindent             " Smart indentation when starting new line
+set hls                     " Highlight previous search
+set is                      " Highlight search incrementally
+set ruler                   " Ruler
+set cursorline              " Highlight current line
+set cursorcolumn            " Highlight current line
+set scrolloff=3             " Show a few lines above and below when scrolling
+set ignorecase              " Ignore case when searching 
+set smartcase               " except if there's an uppercase character
+set splitright              " Split vertically to the right
+set showmatch               " Jump to matching bracket briefly
+set hidden				    " Hidden buffers don't need to be saved. 
+set lazyredraw			    " Don't redraw during macros
+set wildmenu			    " Better command autocompletion
+set display+=lastline       " Display as much as possible of last line
+set encoding=utf-8		    " Use UTF-8
+set textwidth=80            " Wrap comments at 80 chrs 
+set updatetime=500          " Wait before fetching type/symbol information 
+set laststatus=2            " Always show status line
+set showtabline=2           " Always show tabline 
+set noshowmode              " Don't display mode message (use airline instead)
+set completeopt-=preview    " Don't show completion information in preview window
+set diffopt+=vertical       " Do diffs vertically
+set bs=start,eol,indent     " Fix backspace
+set confirm                 " Ask for confirmation instead of failing for :q etc.
+set nowrap                  " Don't wrap lines
+set t_Co=256                " Number of colors, required for tmux
+set mouse=a	                " Enable mouse support
+set spell 					" Lets try out spell checking in comments
+                          
+
+" Formatting options
+set formatoptions=""
+set formatoptions+=j	    " Remove comment character(s) when joining lines
+set formatoptions+=c	    " Autowrap comments
+set formatoptions+=q        " Allow format comments with "gq"
+set formatoptions+=n        " Recognize lists
+
+" Horribly complex pattern to recognize lists for formatoptions+=n
+set formatlistpat=\\(^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*\\|^\\*\\+\\s*\\)
+"
+"set formatoptions-=ro       " Don't autoinsert comment characters after o or
+"<Enter>
 
 "set splitbelow            " Split horizontally down
 "set autochdir			  " Automatically chdir when editing file
@@ -124,15 +137,19 @@ set viewdir=$HOME/.vim/view
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-
 if has('gui') 
 	set guifont=Source\ Code\ Pro\ for\ Powerline:h16
-	set guifont=Operator\ Mono\ XLight:h16
+	set guifont=Operator\ Mono\ Book:h16
     set macligatures
 endif
 
 set termguicolors
+set background=dark
+"colorscheme solarized
+"colorscheme base16-solarized-light
 colorscheme base16-atelier-estuary
+"colorscheme base16-darktooth
+
 
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
@@ -145,8 +162,15 @@ set guioptions-=b
 set guioptions-=e
 
 " Console instead of popup
-" set guioptions+=c
+set guioptions+=c
 
+" Make text italic for various things
+hi Comment gui=italic
+hi Keyword gui=italic
+hi StorageClass gui=italic
+hi Type gui=italic
+hi csModifier gui=italic
+hi csType gui=italic
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KEY MAPPINGS
@@ -176,9 +200,9 @@ nmap √ mz:m+<Cr>`z
 nmap ª mz:m-2<Cr>`z
 vmap ª :m'<-2<Cr>`>my`<mzgv`zo`y
 vmap √ :m'>+<Cr>`<my`>mzgv`yo`z
-
+     
 " Use jk to exit insertion mode
-inoremap jk <C-c>
+inoremap jk <Esc>
 
 if has("nvim") 
     tnoremap <S-Left>  <C-\><C-n><C-w>h
@@ -211,22 +235,28 @@ nnoremap <C-Up>    <C-W>K
 nnoremap <C-Down>  <C-W>J
 
 " Change unimpaired forwards and backwards keys
-nmap ö [
-omap ö [
-xmap ö [
-nmap ä ]
-omap ä ]
-xmap ä ]
+nmap Ö [
+omap Ö [
+xmap Ö [
+nmap Ä ]
+omap Ä ]
+xmap Ä ]
 
-" Make Ö/Ä go thorugh whitespace lines
+" Make ö/ä go thorugh whitespace lines
 " ({ and } don't work like they should, they skip lines that are only
 " whitespace)
-nnoremap Ö :call search('\v^\s*$', 'sb')<CR>
-onoremap Ö :call search('\v^\s*$', 'sb')<CR>
-xnoremap Ö :call search('\v^\s*$', 'sb')<CR>
-nnoremap Ä :call search('\v^\s*$', 's')<CR>
-onoremap Ä :call search('\v^\s*$', 's')<CR>
-xnoremap Ä :call search('\v^\s*$', 's')<CR>
+"nnoremap <silent> ö :call search('^\s*$', 'bW')<CR>
+"onoremap <silent> ö :call search('^\s*$', 'bW')<CR>
+"xnoremap ö {
+"nnoremap <silent> ä :call search('^\s*$', 'W')<CR>
+"onoremap <silent> ä :call search('^\s*$', 'W')<CR>
+"xnoremap ä }
+nnoremap ö {
+onoremap ö {
+xnoremap ö {
+nnoremap ä }
+onoremap ä }
+xnoremap ä }
 
 " Keypad +/- goes up/down the quickfix list
 nnoremap <kMinus> :cprev<CR>
@@ -236,7 +266,6 @@ nnoremap <kPlus>  :cnext<CR>
 nnoremap <S-kMinus> :lprev<CR>
 nnoremap <S-kPlus>  :lnext<CR>
 
-" Use <leader>ss to do a quick search/replace
 nnoremap <leader>ss :%s///gc<left><left><left>
 
 " Select all
