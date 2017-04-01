@@ -6,7 +6,8 @@ import sys
 
 from subprocess import run, PIPE
 
-RESET = '\\[\x1b(B\x1b[m\\]'
+#RESET = '\\[\x1b[0m\\]'
+RESET = '\\[(B[m\\]'
 
 CWD_BG1 = '\\[\x1b[48;5;18m\\]'
 CWD_BG2 = '\\[\x1b[48;5;19m\\]'

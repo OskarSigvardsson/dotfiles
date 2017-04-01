@@ -24,7 +24,7 @@ Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-scripts/BufOnly.vim'
 Plugin 'rizzatti/dash.vim'
-Plugin 'tpope/vim-surround' 
+Plugin 'tpope/vim-surround'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'airblade/vim-gitgutter'
@@ -80,19 +80,19 @@ set ruler                   " Ruler
 set cursorline              " Highlight current line
 set cursorcolumn            " Highlight current line
 set scrolloff=3             " Show a few lines above and below when scrolling
-set ignorecase              " Ignore case when searching 
+set ignorecase              " Ignore case when searching
 set smartcase               " except if there's an uppercase character
 set splitright              " Split vertically to the right
 set showmatch               " Jump to matching bracket briefly
-set hidden				    " Hidden buffers don't need to be saved. 
+set hidden				    " Hidden buffers don't need to be saved.
 set lazyredraw			    " Don't redraw during macros
 set wildmenu			    " Better command autocompletion
 set display+=lastline       " Display as much as possible of last line
 set encoding=utf-8		    " Use UTF-8
-set textwidth=80            " Wrap comments at 80 chrs 
-set updatetime=500          " Wait before fetching type/symbol information 
+set textwidth=80            " Wrap comments at 80 chrs
+set updatetime=500          " Wait before fetching type/symbol information
 set laststatus=2            " Always show status line
-set showtabline=2           " Always show tabline 
+set showtabline=2           " Always show tabline
 set noshowmode              " Don't display mode message (use airline instead)
 set completeopt-=preview    " Don't show completion information in preview window
 set diffopt+=vertical       " Do diffs vertically
@@ -102,7 +102,7 @@ set nowrap                  " Don't wrap lines
 set t_Co=256                " Number of colors, required for tmux
 set mouse=a	                " Enable mouse support
 set spell 					" Lets try out spell checking in comments
-                          
+
 
 " Formatting options
 set formatoptions=""
@@ -137,8 +137,8 @@ set viewdir=$HOME/.vim/view
 " LOOK OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-if has('gui') 
-	set guifont=Source\ Code\ Pro\ for\ Powerline:h16
+if has('gui')
+	"set guifont=Source\ Code\ Pro:h16
 	set guifont=Operator\ Mono\ Book:h16
     set macligatures
 endif
@@ -153,7 +153,7 @@ colorscheme base16-atelier-estuary
 
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-" Remove scrollbars from gui. 
+" Remove scrollbars from gui.
 set guioptions-=r
 set guioptions-=R
 set guioptions-=l
@@ -200,11 +200,12 @@ nmap √ mz:m+<Cr>`z
 nmap ª mz:m-2<Cr>`z
 vmap ª :m'<-2<Cr>`>my`<mzgv`zo`y
 vmap √ :m'>+<Cr>`<my`>mzgv`yo`z
-     
-" Use jk to exit insertion mode
-inoremap jk <Esc>
 
-if has("nvim") 
+" Use jk to exit insertion and command mode
+inoremap jk <C-c>
+cnoremap jk <C-c>
+
+if has("nvim")
     tnoremap <S-Left>  <C-\><C-n><C-w>h
     tnoremap <S-Right> <C-\><C-n><C-w>l
     tnoremap <S-Up>    <C-\><C-n><C-w>k
@@ -272,7 +273,10 @@ nnoremap <leader>ss :%s///gc<left><left><left>
 nnoremap <leader>sa ggvG$
 
 " Search for word with :grep
-nnoremap <silent> <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>  
+nnoremap <silent> <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>
+
+" Fix trailing whitespace (including empty lines)
+nnoremap <silent> <leader>f mz:%s/\v\s+$//<CR>:echo "Whitespace fixed"<CR>g`z
 
 " j/k scrolls screen lines instead of logical lines
 nnoremap j gj
@@ -285,7 +289,7 @@ nnoremap k gk
 " Replace current word with latest yank (mnemonic "stamp word"),
 nnoremap S mzviw"0p`z
 
-" Paste and bump first digit. Takes a count. 
+" Paste and bump first digit. Takes a count.
 nnoremap <silent> § :normal pyy<CR>:silent! call repeat#set("§", v:count)<CR>'[
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -294,7 +298,7 @@ nnoremap <silent> § :normal pyy<CR>:silent! call repeat#set("§", v:count)<CR>
 command! Rc :e ~/.vimrc
 command! SyntaxGroup echo synIDattr(synID(line("."),col("."),0),"name")
 set grepprg=rg\ --vimgrep\ --smart-case\ --word-regexp
-
+"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " AUTOCMDS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

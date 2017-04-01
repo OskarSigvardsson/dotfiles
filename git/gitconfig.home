@@ -1,5 +1,5 @@
 [core]
-	excludesfile = ~/.gitignore_global
+	excludesfile = /Users/oskarsigvardsson/.gitignore_global
 [user]
 	name = Oskar Sigvardsson
 	email = oskarsigvardsson@gmail.com
@@ -19,8 +19,6 @@
     merge-test = "!git merge --no-commit \"$1\" && git merge --abort"
 [push]
 	default = matching
-[init]
-	templatedir = ~/.git_template
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 

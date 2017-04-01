@@ -1,3 +1,7 @@
+set -o vi
+export EDITOR=vim
+PATH=$PATH:$DOTFILES/bin
+
 if which fortune > /dev/null 2> /dev/null
 then
     if which cowsay > /dev/null 2> /dev/null
@@ -9,10 +13,9 @@ then
 fi
 
 source bash/aliases.sh
-#source bash/bash-powerline/bash-powerline.sh
 
 function _update_ps1() {
-    PS1="$(~/.bash_prompt.py $?)"
+    PS1="$($DOTFILES/bash/bash_prompt.py $?)"
 }
 
 if [ "$TERM" != "linux" ]; then
