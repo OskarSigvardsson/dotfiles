@@ -102,6 +102,8 @@ set nowrap                  " Don't wrap lines
 set t_Co=256                " Number of colors, required for tmux
 set mouse=a	                " Enable mouse support
 set spell 					" Lets try out spell checking in comments
+set exrc                    " Enable project-specific .vimrc
+set secure                  " Add security features for project-specific vimrc's
 
 
 " Formatting options
