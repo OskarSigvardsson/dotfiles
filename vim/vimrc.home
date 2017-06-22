@@ -13,7 +13,7 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'tpope/vim-fugitive'
 Plugin 'L9'
-Plugin 'scrooloose/syntastic'
+Plugin 'vim-syntastic/syntastic'
 Plugin 'vim-scripts/taglist.vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'Valloric/YouCompleteMe'
@@ -41,6 +41,7 @@ Plugin 'vim-scripts/ShaderHighLight'
 "Plugin 'itchyny/vim-cursorword'
 Plugin 'rdnetto/YCM-Generator'
 Plugin 'Shougo/echodoc.vim'
+Plugin 'tommcdo/vim-lion'
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
@@ -140,21 +141,24 @@ set viewdir=$HOME/.vim/view
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has('gui')
-	"set guifont=Source\ Code\ Pro:h16
-	set guifont=Operator\ Mono\ Book:h16
     set macligatures
+	"set guifont=Source\ Code\ Pro:h16
+	"set guifont=Operator\ Mono\ Book:h16
+	set guifont=Fira\ Code\ Light:h16
 endif
 
 set termguicolors
-set background=dark
-"colorscheme solarized
+set background=light
+colorscheme solarized
 "colorscheme base16-solarized-light
-colorscheme base16-atelier-estuary
+"colorscheme base16-atelier-estuary
 "colorscheme base16-darktooth
+"colorscheme gruvbox
+"colorscheme base16-solarized-light
 
 
-let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+"let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+"let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 " Remove scrollbars from gui.
 set guioptions-=r
 set guioptions-=R
@@ -164,15 +168,15 @@ set guioptions-=b
 set guioptions-=e
 
 " Console instead of popup
-set guioptions+=c
+"set guioptions+=c
 
 " Make text italic for various things
-hi Comment gui=italic
-hi Keyword gui=italic
-hi StorageClass gui=italic
-hi Type gui=italic
-hi csModifier gui=italic
-hi csType gui=italic
+"hi Comment gui+=italic
+"hi Keyword gui+=italic
+"hi StorageClass gui+=italic
+"hi Type gui+=italic
+"hi csModifier gui+=italic
+"hi csType gui+=italic
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KEY MAPPINGS
@@ -237,13 +241,15 @@ nnoremap <C-Right> <C-W>L
 nnoremap <C-Up>    <C-W>K
 nnoremap <C-Down>  <C-W>J
 
+" H/L instead of $^
+noremap H ^
+noremap L $
+
 " Change unimpaired forwards and backwards keys
-nmap Ö [
-omap Ö [
-xmap Ö [
-nmap Ä ]
-omap Ä ]
-xmap Ä ]
+map Ö [
+map! Ö [
+map Ä ]
+map! Ä ]
 
 " Make ö/ä go thorugh whitespace lines
 " ({ and } don't work like they should, they skip lines that are only
@@ -254,16 +260,17 @@ xmap Ä ]
 "nnoremap <silent> ä :call search('^\s*$', 'W')<CR>
 "onoremap <silent> ä :call search('^\s*$', 'W')<CR>
 "xnoremap ä }
-nnoremap ö {
-onoremap ö {
-xnoremap ö {
-nnoremap ä }
-onoremap ä }
-xnoremap ä }
+map  ö {
+map  ä }
+map! ö {
+map! ä }
 
-" Keypad +/- goes up/down the quickfix list
-nnoremap <kMinus> :cprev<CR>
-nnoremap <kPlus>  :cnext<CR>
+
+" +/- goes up/down the quickfix list, use alt to go through location list
+nnoremap <silent> - :cprev<CR>
+nnoremap <silent> + :cnext<CR>
+nnoremap <silent> – :lprev<CR>
+nnoremap <silent> ± :lnext<CR>
 
 " Shift Keypad +/- goes up/down the location list
 nnoremap <S-kMinus> :lprev<CR>
@@ -278,7 +285,14 @@ nnoremap <leader>sa ggvG$
 nnoremap <silent> <leader>r :silent execute "grep " . substitute("<C-r>/", "[<>]", "", "g")<CR>
 
 " Fix trailing whitespace (including empty lines)
-nnoremap <silent> <leader>f mz:%s/\v\s+$//<CR>:echo "Whitespace fixed"<CR>g`z
+function! FixWhitespace()
+	normal mz
+	%s/\s\+$//e
+	normal `z
+	echo "Whitespace fixed"
+endfunction
+
+nnoremap <silent> <leader>f :call FixWhitespace()<CR>
 
 " j/k scrolls screen lines instead of logical lines
 nnoremap j gj
@@ -330,12 +344,14 @@ autocmd FileType help nnoremap <buffer> <CR> <C-]>
 autocmd FileType help nnoremap <buffer> <BS> <C-T>
 autocmd FileType help wincmd L
 
+" Always wrap quickfix
+autocmd FileType qf set wrap
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_javascript_checkers = ['jshint']
@@ -352,6 +368,8 @@ autocmd FileType cs nnoremap <leader>ou  :OmniSharpFindUsages<CR>
 autocmd FileType cs nnoremap <leader>ous :OmniSharpFixUsings<CR>
 autocmd FileType cs nnoremap <leader>oa  :OmniSharpGetCodeActions<CR>
 autocmd FileType cs nnoremap <leader>on  :OmniSharpRename<CR>
+autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
+autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 
 " YouCompleteMe settings
 let g:ycm_add_preview_to_completeopt = 0
@@ -378,7 +396,7 @@ endif
 let g:airline_powerline_fonts = 0
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
-let g:airline_symbols.branch = '⎇'
+let g:airline_symbols.branch = '⑂'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
 let g:airline#extensions#tabline#formatter = 'unique_tail'
@@ -393,3 +411,6 @@ autocmd BufWinEnter *.wiki setlocal shiftwidth=2 tabstop=2 expandtab
 " Tagbar
 nnoremap <silent> T :TagbarToggle<CR>
 let g:tagbar_sort = 0
+
+" gitgutter
+let g:gitgutter_sign_column_always = 1

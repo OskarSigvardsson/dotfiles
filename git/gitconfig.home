@@ -2,7 +2,7 @@
 	excludesfile = /Users/oskarsigvardsson/.gitignore_global
 [user]
 	name = Oskar Sigvardsson
-	email = oskarsigvardsson@gmail.com
+	email = oskar.sigvardsson@groplay.com
 [alias]
 	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --decorate
 	ls-all = log --pretty=medium --date=relative --abbrev-commit --graph --stat --branches --remotes --decorate
@@ -25,3 +25,9 @@
 [mergetool "sourcetree"]
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[mergetool "unityyamlmerge"]
+    trustExitCode = false
+    cmd = '/Applications/Unity-5.6.1f1/Unity.app/Contents/Tools/UnityYAMLMerge' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+
+[commit]
+	template = /Users/oskarsigvardsson/.stCommitMsg
