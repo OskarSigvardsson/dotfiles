@@ -102,7 +102,7 @@ set confirm                 " Ask for confirmation instead of failing for :q etc
 set nowrap                  " Don't wrap lines
 set t_Co=256                " Number of colors, required for tmux
 set mouse=a	                " Enable mouse support
-set spell 					" Lets try out spell checking in comments
+"set spell 					" Lets try out spell checking in comments
 set exrc                    " Enable project-specific .vimrc
 set secure                  " Add security features for project-specific vimrc's
 
@@ -144,21 +144,23 @@ if has('gui')
     set macligatures
 	"set guifont=Source\ Code\ Pro:h16
 	"set guifont=Operator\ Mono\ Book:h16
-	set guifont=Fira\ Code\ Light:h16
+	set guifont=Fira\ Code\ Light:h17
 endif
 
 set termguicolors
 set background=light
-colorscheme solarized
+"colorscheme solarized
 "colorscheme base16-solarized-light
-"colorscheme base16-atelier-estuary
+colorscheme base16-atelier-estuary
 "colorscheme base16-darktooth
 "colorscheme gruvbox
 "colorscheme base16-solarized-light
 
+if &term =~# '^screen'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
 
-"let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-"let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 " Remove scrollbars from gui.
 set guioptions-=r
 set guioptions-=R
@@ -306,7 +308,8 @@ nnoremap k gk
 nnoremap S mzviw"0p`z
 
 " Paste and bump first digit. Takes a count.
-nnoremap <silent> § :normal pyy<CR>:silent! call repeat#set("§", v:count)<CR>'[
+"nnoremap <silent> § :normal pyy<CR>:silent! call repeat#set("§", v:count)<CR>'[
+nnoremap <silent> <C-p> :normal pyy<CR>'[
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COMMAND CUSTOMIZATIONS
@@ -393,9 +396,9 @@ if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
 
-let g:airline_powerline_fonts = 0
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
+let g:airline_powerline_fonts = 1
+"let g:airline_left_sep = ''
+"let g:airline_right_sep = ''
 let g:airline_symbols.branch = '⑂'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']

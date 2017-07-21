@@ -10,4 +10,3 @@ alias gls="git ls"
 
 alias less="less -RFX"
 alias rg="rg -p"
-
