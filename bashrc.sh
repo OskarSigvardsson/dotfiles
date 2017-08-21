@@ -8,3 +8,4 @@ do
 done
 
 popd > /dev/null
+cd
