@@ -13,35 +13,42 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'tpope/vim-fugitive'
 Plugin 'L9'
-Plugin 'vim-syntastic/syntastic'
-Plugin 'vim-scripts/taglist.vim'
-Plugin 'majutsushi/tagbar'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'tpope/vim-dispatch'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'OrangeT/vim-csharp'
-Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-scripts/BufOnly.vim'
 Plugin 'rizzatti/dash.vim'
 Plugin 'tpope/vim-surround'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'airblade/vim-gitgutter'
 Plugin 'airblade/vim-rooter'
 Plugin 'tpope/vim-repeat'
-Plugin 'metakirby5/codi.vim'
-Plugin 'JamshedVesuna/vim-markdown-preview'
-"Plugin 'tsaleh/vim-supertab'
-"Plugin 'ervandew/supertab'
 Plugin 'rust-lang/rust.vim'
-Plugin 'junegunn/goyo.vim'
-Plugin 'vimwiki/vimwiki'
-Plugin 'vim-scripts/ShaderHighLight'
 "Plugin 'itchyny/vim-cursorword'
-Plugin 'rdnetto/YCM-Generator'
 Plugin 'Shougo/echodoc.vim'
 Plugin 'tommcdo/vim-lion'
+Plugin 'arecarn/vim-crunch'
+Plugin 'OrangeT/vim-csharp'
+Plugin 'junegunn/goyo.vim'
+Plugin 'haya14busa/vim-gtrans'
+
+
+if empty($VIM_LIGHT)
+    if !has('nvim')
+        Plugin 'Valloric/YouCompleteMe'
+        Plugin 'rdnetto/YCM-Generator'
+        Plugin 'OmniSharp/omnisharp-vim'
+        Plugin 'tpope/vim-dispatch'
+    endif
+
+	Plugin 'airblade/vim-gitgutter'
+    Plugin 'vim-syntastic/syntastic'
+    Plugin 'vim-scripts/taglist.vim'
+    Plugin 'majutsushi/tagbar'
+    Plugin 'vim-scripts/ShaderHighLight'
+    Plugin 'qualiabyte/vim-colorstepper'
+    Plugin 'justinmk/vim-sneak'
+    "Plugin 'SirVer/ultisnips'
+endif
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
@@ -53,11 +60,9 @@ Plugin 'whatyouhide/vim-gotham'
 Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'chriskempson/base16-vim'
 Plugin 'jacoborus/tender'
-Plugin 'qualiabyte/vim-colorstepper'
 Plugin 'morhetz/gruvbox'
-
 Plugin 'pyte'
-"Plugin 'oceanlight'
+
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -70,7 +75,6 @@ syntax on
 
 set number                  " Show line numbers
 set relativenumber          " Show relative numbers, except on current line
-"set autowrite               " Autowrite after commands
 set shiftwidth=4            " Number of indent spaces
 set expandtab               " Expand tabs to spaces
 set tabstop=4               " Number of spaces for a tab
@@ -102,10 +106,10 @@ set confirm                 " Ask for confirmation instead of failing for :q etc
 set nowrap                  " Don't wrap lines
 set t_Co=256                " Number of colors, required for tmux
 set mouse=a	                " Enable mouse support
-"set spell 					" Lets try out spell checking in comments
 set exrc                    " Enable project-specific .vimrc
 set secure                  " Add security features for project-specific vimrc's
 set signcolumn=yes          " Show signcolumn (gitgutter column)
+set autoread 				" Reload changed file, but only if it's not changed in vim
 
 
 " Formatting options
@@ -145,17 +149,17 @@ if has('gui')
     set macligatures
 	"set guifont=Source\ Code\ Pro:h16
 	"set guifont=Operator\ Mono\ Book:h16
-	set guifont=Fira\ Code\ Light:h17
+	set guifont=Operator\ Mono\ Light:h20
 endif
 
 set termguicolors
-set background=light
+set background=dark
 "colorscheme solarized
 "colorscheme base16-solarized-light
 "colorscheme base16-atelier-estuary
 "colorscheme base16-darktooth
-colorscheme base16-woodland
-"colorscheme gruvbox
+"colorscheme base16-woodland
+colorscheme gruvbox
 "colorscheme base16-solarized-light
 
 if &term =~# '^screen'
@@ -163,7 +167,9 @@ if &term =~# '^screen'
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
-set term=xterm-256color
+if !has('nvim') 
+    set term=xterm-256color
+endif
 
 " Remove scrollbars from gui.
 set guioptions-=r
@@ -184,6 +190,12 @@ set guioptions-=e
 "hi csModifier gui+=italic
 "hi csType gui+=italic
 
+" Highlight c# class names as types
+hi def link csClass Type
+
+" Make gutter column same color as ruler
+"hi link SignColumn LineNr
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KEY MAPPINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -202,7 +214,7 @@ nnoremap <Space> :
 vnoremap <Space> :
 
 " Enter moves a line down in normal mode
-nmap <CR> O<C-c>j
+nnoremap <CR> O<C-c>j
 
 " Delete clears a line
 nmap <Del> cc<Esc>
@@ -216,13 +228,6 @@ vmap √ :m'>+<Cr>`<my`>mzgv`yo`z
 " Use jk to exit insertion and command mode
 inoremap jk <C-c>
 cnoremap jk <C-c>
-
-if has("nvim")
-    tnoremap <S-Left>  <C-\><C-n><C-w>h
-    tnoremap <S-Right> <C-\><C-n><C-w>l
-    tnoremap <S-Up>    <C-\><C-n><C-w>k
-    tnoremap <S-Down>  <C-\><C-n><C-w>j
-endif
 
 " Use arrow keys to move between window splits
 nnoremap <Left>  <C-w>h
@@ -247,30 +252,17 @@ nnoremap <C-Right> <C-W>L
 nnoremap <C-Up>    <C-W>K
 nnoremap <C-Down>  <C-W>J
 
-" H/L instead of $^
-noremap H ^
-noremap L $
-
 " Change unimpaired forwards and backwards keys
 map Ö [
-map! Ö [
 map Ä ]
-map! Ä ]
 
 " Make ö/ä go thorugh whitespace lines
-" ({ and } don't work like they should, they skip lines that are only
-" whitespace)
-"nnoremap <silent> ö :call search('^\s*$', 'bW')<CR>
-"onoremap <silent> ö :call search('^\s*$', 'bW')<CR>
-"xnoremap ö {
-"nnoremap <silent> ä :call search('^\s*$', 'W')<CR>
-"onoremap <silent> ä :call search('^\s*$', 'W')<CR>
-"xnoremap ä }
-map  ö {
-map  ä }
-map! ö {
-map! ä }
-
+"map Ö 10k
+"map Ä 10j
+map <C-j> 10j
+map <C-k> 10k
+map ö {
+map ä }
 
 " +/- goes up/down the quickfix list, use alt to go through location list
 nnoremap <silent> - :cprev<CR>
@@ -321,7 +313,7 @@ nnoremap <silent> <C-p> :normal pyy<CR>'[
 command! Rc :e ~/.vimrc
 command! SyntaxGroup echo synIDattr(synID(line("."),col("."),0),"name")
 set grepprg=rg\ --vimgrep\ --smart-case\ --word-regexp
-"
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " AUTOCMDS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -353,44 +345,52 @@ autocmd FileType help wincmd L
 
 " Always wrap quickfix
 autocmd FileType qf set wrap
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Syntastic settings
-let g:syntastic_always_populate_loc_list = 1
-"let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_javascript_checkers = ['jshint']
-let g:syntastic_cs_checkers = ['syntax', 'semantic']
+if empty($VIM_LIGHT)
+    " Syntastic settings
+    let g:syntastic_always_populate_loc_list = 1
+    "let g:syntastic_auto_loc_list = 1
+    let g:syntastic_check_on_open = 1
+    let g:syntastic_check_on_wq = 0
+    let g:syntastic_javascript_checkers = ['jshint']
+    let g:syntastic_cs_checkers = ['syntax', 'semantic']
 
-" OmniSharp settings
-let g:OmniSharp_timeout=10
-autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-autocmd FileType cs nnoremap <leader>or  :OmniSharpAddToProject<CR>:OmniSharpReloadSolution<CR>:OmniSharpBuild<CR>
-autocmd FileType cs nnoremap <leader>ot  :OmniSharpFindType<CR>
-autocmd FileType cs nnoremap <leader>otl :call OmniSharp#TypeLookupWithoutDocumentation()<CR>
-autocmd FileType cs nnoremap <leader>od  :vsp<CR>:OmniSharpGotoDefinition<CR>
-autocmd FileType cs nnoremap <leader>ou  :OmniSharpFindUsages<CR>
-autocmd FileType cs nnoremap <leader>ous :OmniSharpFixUsings<CR>
-autocmd FileType cs nnoremap <leader>oa  :OmniSharpGetCodeActions<CR>
-autocmd FileType cs nnoremap <leader>on  :OmniSharpRename<CR>
-"autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
-"autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+    " OmniSharp settings
+    let g:OmniSharp_timeout=10
+    autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+	"autocmd FileType cs OmniSharpHighlightTypes
+    autocmd FileType cs nnoremap <leader>or  :OmniSharpAddToProject<CR>:OmniSharpReloadSolution<CR>:OmniSharpBuild<CR>
+    autocmd FileType cs nnoremap <leader>ot  :OmniSharpFindType<CR>
+    autocmd FileType cs nnoremap <leader>otl :call OmniSharp#TypeLookupWithoutDocumentation()<CR>
+    autocmd FileType cs nnoremap <leader>od  :vsp<CR>:OmniSharpGotoDefinition<CR>
+    autocmd FileType cs nnoremap <leader>ou  :OmniSharpFindUsages<CR>
+    autocmd FileType cs nnoremap <leader>ous :OmniSharpFixUsings<CR>
+    autocmd FileType cs nnoremap <leader>oa  :OmniSharpGetCodeActions<CR>
+    autocmd FileType cs nnoremap <leader>on  :OmniSharpRename<CR>
+    "autocmd CursorHold,BufEnter,TextChanged,InsertLeave *.cs OmniSharpHighlightTypes
+    "autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
+    "autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 
-" YouCompleteMe settings
-let g:ycm_add_preview_to_completeopt = 0
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_key_list_select_completion = ['<TAB>', '<Down>', '<Enter>']
-let g:ycm_auto_trigger = 1
-let g:ycm_min_num_of_chars_for_completion = 1
-let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+    " YouCompleteMe settings
+    let g:ycm_add_preview_to_completeopt = 0
+    let g:ycm_show_diagnostics_ui = 0
+    let g:ycm_key_list_select_completion = ['<TAB>', '<Down>', '<Enter>']
+    let g:ycm_auto_trigger = 1
+    let g:ycm_min_num_of_chars_for_completion = 1
+    let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+endif
+
+" fzf settings
+nnoremap <Leader>p :Files<CR>
 
 " CtrlP settings
-let g:ctrlp_map = '<leader>p'
+let g:ctrlp_map = '<Leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_user_command = ['.git', 'cd %s && rg --files-with-matches ".*"', 'find %s -type f']
-au FileType cs let g:ctrlp_user_command = ['.git', 'cd %s && rg --files-with-matches ".*" --glob "*.cs"', 'find %s -type f']
+"au FileType cs let g:ctrlp_user_command = ['.git', 'cd %s && rg --files-with-matches ".*" --glob "*.cs"', 'find %s -type f']
 
 " Vim-Dash settings
 nmap <silent> <leader>d <Plug>DashSearch
@@ -400,26 +400,21 @@ if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
 
-let g:airline_powerline_fonts = 1
-"let g:airline_left_sep = ''
-"let g:airline_right_sep = ''
+"let g:airline_powerline_fonts = 1
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
 let g:airline_symbols.branch = '⑂'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#checks = ['mixed-indentfile']
 let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:airline#extensions#tabline#left_sep = ''
+let g:airline#extensions#tabline#left_alt_sep = ''
 
 " Markdown preview
 let vim_markdown_preview_github=1
-
-" Vim-wiki
-let g:vimwiki_list = [{'path': '~/Dropbox/Wiki/Source', 'path_html': '~/Dropbox/Wiki/HTML'}]
-autocmd BufWinEnter *.wiki setlocal shiftwidth=2 tabstop=2 expandtab
-
-" Tagbar
-nnoremap <silent> T :TagbarToggle<CR>
-let g:tagbar_sort = 0
 
 " Colorstepper
 nmap <F6> <Plug>ColorstepPrev
 nmap <F7> <Plug>ColorstepNext
 nmap <S-F7> <Plug>ColorstepReload
+

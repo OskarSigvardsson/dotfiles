@@ -18,7 +18,7 @@
     fls = "!git fetch; git ls"
     merge-test = "!git merge --no-commit \"$1\" && git merge --abort"
 [push]
-	default = matching
+	default = simple
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
@@ -27,7 +27,7 @@
 	trustExitCode = true
 [mergetool "unityyamlmerge"]
     trustExitCode = false
-    cmd = '/Applications/Unity-5.6.1f1/Unity.app/Contents/Tools/UnityYAMLMerge' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+    cmd = '/Applications/Unity-5.6.3p1/Unity.app/Contents/Tools/UnityYAMLMerge' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 
 [commit]
 	template = /Users/oskarsigvardsson/.stCommitMsg
