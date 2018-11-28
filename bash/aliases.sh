@@ -1,5 +1,5 @@
 alias map="xargs -n1"
-alias e="$EDITOR"
+alias e="emacs-edit"
 
 # git aliases
 alias gs="git status"
