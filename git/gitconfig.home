@@ -13,7 +13,7 @@
 	amend = commit --amend --reuse-message=HEAD
 	lastmessage = commit --amend
 	co = checkout
-	pr = pull --rebase --all
+	pr = pull --rebase
 	fs = "!git fetch; git status"
     fls = "!git fetch; git ls"
     merge-test = "!git merge --no-commit \"$1\" && git merge --abort"
@@ -27,7 +27,12 @@
 	trustExitCode = true
 [mergetool "unityyamlmerge"]
     trustExitCode = false
-    cmd = '/Applications/Unity-5.6.3p1/Unity.app/Contents/Tools/UnityYAMLMerge' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+    cmd = '/Applications/Unity-2017.3.0p4/Unity.app/Contents/Tools/UnityYAMLMerge' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 
 [commit]
 	template = /Users/oskarsigvardsson/.stCommitMsg
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
