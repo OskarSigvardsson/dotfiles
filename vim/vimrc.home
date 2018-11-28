@@ -36,7 +36,7 @@ if empty($VIM_LIGHT)
     if !has('nvim')
         Plugin 'Valloric/YouCompleteMe'
         Plugin 'rdnetto/YCM-Generator'
-        Plugin 'OmniSharp/omnisharp-vim'
+        "Plugin 'OmniSharp/omnisharp-vim'
         Plugin 'tpope/vim-dispatch'
     endif
 
