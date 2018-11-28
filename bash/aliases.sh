@@ -1,6 +1,5 @@
 alias map="xargs -n1"
-
-alias timer='echo "Timer started. Stop with Ctrl-D." && echo && date && time cat && date'
+alias e="$EDITOR"
 
 # git aliases
 alias gs="git status"
