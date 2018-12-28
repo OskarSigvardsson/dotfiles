@@ -18,7 +18,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#1d2021" :foreground "#d5c4a1" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 220 :width normal :foundry "nil" :family "Operator Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "#1d2021" :foreground "#d5c4a1" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 180 :width normal :foundry "nil" :family "Operator Mono"))))
  '(org-checkbox-statistics-done ((t (:inherit org-done :weight bold))))
  '(org-done ((t (:foreground "#b8bb26" :weight bold))))
  '(org-link ((t (:foreground "#83a598" :underline t))))
