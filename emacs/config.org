@@ -126,11 +126,11 @@ The default value is insanity.
 #+END_SRC
 ** Fix whitespace before saving
 #+BEGIN_SRC emacs-lisp
-  (add-hook
-   'before-save-hook
-   (lambda ()
-     (when (and (bound-and-true-p evil-mode) (evil-normal-state-p))
-       (delete-trailing-whitespace))))
+  ; (add-hook
+  ;  'before-save-hook
+  ;  (lambda ()
+  ;    (when (and (bound-and-true-p evil-mode) (evil-normal-state-p))
+  ;      (delete-trailing-whitespace))))
 #+END_SRC
 
 *** DONE don't do this if we're in insert state
@@ -963,6 +963,14 @@ idea, but it's neat sometimes.
    :states '(normal insert)
    "<M-return>" 'evil-eval-and-print-sexp
    "<S-return>" 'eval-last-sexp)
+#+END_SRC
+
+** Lua
+#+BEGIN_SRC emacs-lisp
+  (use-package lua-mode
+    :ensure t
+    :config
+    (add-hook 'lua-mode-hook (lambda () (setq indent-tabs-mode t))))
 #+END_SRC
 * Start-up
 ** Split window into default buffers
