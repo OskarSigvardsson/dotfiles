@@ -1,8 +1,9 @@
 [core]
 	excludesfile = $HOME/.gitignore_global
+	autocrlf = true
 [user]
 	name = Oskar Sigvardsson
-	email = oskar.sigvardsson@groplay.com
+	email = oskarsigvardsson@gmail.com
 [alias]
 	ls = log --pretty=medium --date=relative --abbrev-commit --graph --stat --decorate
 	ls-all = log --pretty=medium --date=relative --abbrev-commit --graph --stat --branches --remotes --decorate
@@ -28,9 +29,6 @@
 [mergetool "unityyamlmerge"]
     trustExitCode = false
     cmd = '/Applications/Unity-2017.3.0p4/Unity.app/Contents/Tools/UnityYAMLMerge' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
-
-[commit]
-	template = /Users/oskarsigvardsson/.stCommitMsg
 [filter "lfs"]
 	process = git-lfs filter-process
 	required = true
