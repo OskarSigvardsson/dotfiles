@@ -170,14 +170,18 @@ default.
 #+BEGIN_SRC emacs-lisp
   (setq-default
    tab-width        4
-   c-basic-offset   4
-   indent-tabs-mode nil)
+   c-basic-offset   4)
+   ;indent-tabs-mode nil)
 #+END_SRC
 ** Compile/recompile with F5
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "S-<f5>") 'compile)
   (global-set-key (kbd "<f5>") 'recompile)
+#+END_SRC
+** Use ido-mode
+#+BEGIN_SRC emacs-lisp
+  (ido-mode t)
 #+END_SRC
 * Custom functions
 ** Move lines up/down
@@ -219,7 +223,7 @@ normal state.
 
 ** Kill number and put it into calc
 #+BEGIN_SRC emacs-lisp
-  (defun kill-number-into-calc ()
+  (defun gk/kill-number-into-calc ()
     (interactive)
     (save-excursion
       (let ((start (point))
@@ -230,6 +234,8 @@ normal state.
     (calc)
     (calc-yank 10))
 #+END_SRC
+ 
+*** TODO make it work for floats
 
 ** Show face under cursor
 #+BEGIN_SRC emacs-lisp
@@ -252,14 +258,28 @@ Run compile with makefile in first ancestor directory with one in it.
 
 #+END_SRC
 
-* Look options
-** Font
-The most important setting of all!
+** Change default font sizes
+Functions to change the default font size. I don't like emacs default
+implementation of this, it changes the font size buffer-locally.
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Operator Mono" :height 220)
+  (defun gk/increase-default-font-size (&optional step)
+    "Increase the default font size"
+    (interactive "P")
+    (let* ((old-size (face-attribute 'default :height))
+           (new-size (+ old-size (or step 10))))
+
+      (set-face-attribute 'default nil :height new-size)
+
+      (message (concat "Default font size is now " (number-to-string new-size)))))
+
+  (defun gk/decrease-default-font-size (&optional step)
+    "Decrease the default font size"
+    (interactive "P")
+    (gk/increase-default-font-size (- 0 (or step 10))))
 #+END_SRC
 
+* Look options
 ** Theme
 Keep switching these...
 *** Base16
@@ -295,15 +315,20 @@ Keep switching these...
 ;  (load-theme 'darktooth t)
 ;  (darktooth-modeline))
 #+END_SRC
-** Face settings
-The bolds and italics on Operator Mono are unbeatable
+** Faces
+The most important setting of all!
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :height 150 :foundry "Matt" :family "Triplicate T4c")
+#+END_SRC
+
+
+Use italics and bold more liberally.
 
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'font-lock-type-face nil :slant 'italic)
   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil :weight 'bold)
-
-
 #+END_SRC
 
 The "outline" faces are what's used for org headlines (at least in
@@ -321,29 +346,7 @@ hard-set these headlines to be regular weight and slant.
   (set-face-attribute 'outline-7 nil :weight 'normal :slant 'normal)
   (set-face-attribute 'outline-8 nil :weight 'normal :slant 'normal)
 #+END_SRC
-** Modeline
-I can't get the "package" modelines to work quite like i want them. I
-should just write my own fancy modeline.
-*** Doom
-#+BEGIN_SRC emacs-lisp
-  ; (use-package doom-modeline
-  ;       :ensure t
-  ;       :defer t
-  ;       :hook (after-init . doom-modeline-init))
-#+END_SRC
-*** Powerline
-#+BEGIN_SRC emacs-lisp
-  ;(use-package powerline
-  ;  :ensure t)
-  ;(setq powerline-image-apple-rgb t)
-  ;(powerline-default-theme)
-#+END_SRC
-
-*** TODO write your own modeline
-Thicken it up a little, at least.
-#+BEGIN_SRC emacs-lisp
-#+END_SRC
-** Remove GUI elements
+** GUI
 No toolbar or scrollbar. Maybe no fringe?
 
 #+BEGIN_SRC emacs-lisp
@@ -352,43 +355,24 @@ No toolbar or scrollbar. Maybe no fringe?
   ;(set-face-attribute 'fringe nil :background nil)
 #+END_SRC
 
-** Show line numbers
-nlinum is way faster than the built in linum.
+Enable relative line numbers
 
 #+BEGIN_SRC emacs-lisp
-
-  ; (use-package nlinum
-  ;   :ensure t
-  ;   :config
-
-  ;     (global-nlinum-mode t)
-  ;     (setq nlinum-format "%4d "))
-
-#+END_SRC
-
-Update! Emacs 26 now has a much better mode that's faster and supports
-relative line numbers.
-
-#+BEGIN_SRC emacs-lisp
-
   (setq-default display-line-numbers 'relative)
-
 #+END_SRC
+
+But no line numbers in magit
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'magit-pre-display-buffer-hook
-            (lambda ()
-              (setq display-line-numbers nil)))
+            (lambda () (setq display-line-numbers nil)))
 #+END_SRC
-** Cursor line
 Highlight current line
 
 #+BEGIN_SRC emacs-lisp
   (global-hl-line-mode t)
 #+END_SRC
 
-*** TODO cursor column
-** Maximize window
 Start maximized
 
 #+BEGIN_SRC emacs-lisp
@@ -423,12 +407,12 @@ Company for autocompletion
     ; (add-to-list 'company-backends 'company-files)
 
     ;; Limit backends, tabnine will do most of the work
-    (setq company-backends '(company-capf company-files))
+    ;; (setq company-backends '(company-capf company-files))
 
     (add-hook 'text-mode-hook (lambda () (company-mode -1)))
 
     ;; Trigger completion immediately.
-    (setq company-idle-delay 0)
+    (setq-default company-idle-delay 0.25)
 
     ;; Number the candidates (use M-1, M-2 etc to select completions).
     (setq company-show-numbers t)
@@ -449,6 +433,7 @@ Company for autocompletion
     :config
     (projectile-global-mode +1))
 #+END_SRC
+
 ** Magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -492,24 +477,21 @@ Yas, queen.
   (use-package ledger-mode
     :ensure t
     :config
-    (setq-default ledger-binary-path "/usr/local/bin/ledger")
+    ; (setq-default ledger-binary-path "/usr/local/bin/ledger")
 
     ; (add-to-list 'evil-motion-state-modes 'ledger-report-mode)
     ; (add-to-list 'evil-motion-state-modes 'ledger-reconcile-mode)
 
     (setq ledger-clear-whole-transactions t
           ledger-reconcile-default-commodity "kr"
-          ledger-reports
-          (quote
-           (("reg-checking" "ledger -f ledger.ledger reg checking")
-            ("register-checking" "ledger reg checking")
-            ("bal" "%(binary) -f %(ledger-file) bal")
-            ("reg" "%(binary) -f %(ledger-file) reg")
-            ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")
-            ("account" "%(binary) -f %(ledger-file) reg %(account)"))))
 
-      (use-package flycheck-ledger
-          :ensure t))
+          ledger-reconcile-buffer-account-max-chars 16
+          ledger-reconcile-buffer-line-format "%(date)s %-22(payee)s %-16(account)s %12(amount)s\n"
+          ledger-reconcile-buffer-payee-max-chars 20
+          ledger-reconcile-default-commodity "kr")
+
+    (add-to-list 'evil-emacs-state-modes 'ledger-reconcile-mode)
+    (add-to-list 'evil-emacs-state-modes 'ledger-report-mode))
 #+END_SRC
 ** neotree
 #+BEGIN_SRC emacs-lisp
@@ -542,6 +524,21 @@ Lets try this thing out!
 
 To install binary, run `M-x company-tabnine-install-binary`
 
+** Telephone line
+For the modeline
+
+#+BEGIN_SRC emacs-lisp
+  (use-package telephone-line
+    :ensure t
+    :config
+    (setq telephone-line-primary-left-separator 'telephone-line-identity-right
+          telephone-line-secondary-left-separator 'telephone-line-flat
+          telephone-line-primary-right-separator 'telephone-line-identity-left
+          telephone-line-secondary-right-separator 'telephone-line-flat
+          telephone-line-height 50)
+    (telephone-line-mode 1))
+#+END_SRC
+
 * Helm
 ** Load
 
@@ -563,7 +560,6 @@ To install binary, run `M-x company-tabnine-install-binary`
 #+END_SRC
 
 ** Grepping
-
 *** Search entire git repo
 
 #+BEGIN_SRC emacs-lisp
@@ -621,7 +617,7 @@ To install binary, run `M-x company-tabnine-install-binary`
      ",g"                'helm-rg-git-root  ; defined in helm section
      ",k"                'kill-this-buffer
      ",h"                'helm-apropos
-     ",c"                'kill-number-into-calc
+     ",c"                'gk/kill-number-into-calc
      "√"                 'gk/move-line-down
      "ª"                 'gk/move-line-up
      "π"                 'evil-paste-increment-and-yank
@@ -644,8 +640,16 @@ To install binary, run `M-x company-tabnine-install-binary`
      "gC"   'uncomment-region)
 
     (general-define-key
-     :states 'insert
-     "<tab>"   'tab-to-tab-stop))
+        :states 'insert
+        "<tab>"   'tab-to-tab-stop
+        "ö"       (lambda () (interactive) (insert "{") (indent-according-to-mode))
+        "ä"       (lambda () (interactive) (insert "}") (indent-according-to-mode))
+        "Ö"       (lambda () (interactive) (insert "["))
+        "Ä"       (lambda () (interactive) (insert "]"))
+        "{"       (lambda () (interactive) (insert "ö"))
+        "}"       (lambda () (interactive) (insert "ä"))
+        "["       (lambda () (interactive) (insert "Ö"))
+        "]"       (lambda () (interactive) (insert "Ä"))))
 
   (add-hook 'evil-mode-hook 'evil-set-keys)
 #+END_SRC
@@ -722,7 +726,18 @@ been mapped to escape, it's no longer really needed as much.
     (move-beginning-of-line 1)
     (kill-line))
 #+END_SRC
-** Insert empty line
+** Indent text object
+Creates a new text object for indents, with keys ii and ai (i.e. dii,
+vii, cii, etc)
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'evil-mode-hook
+            (lambda ()
+              (use-package evil-indent-plus
+                :ensure t
+                :config
+                (evil-indent-plus-default-bindings))))
+#+END_SRC
 ** Load it
 
 #+BEGIN_SRC emacs-lisp
@@ -966,11 +981,43 @@ idea, but it's neat sometimes.
 #+END_SRC
 
 ** Lua
+Add lua mode
+
 #+BEGIN_SRC emacs-lisp
   (use-package lua-mode
     :ensure t
     :config
     (add-hook 'lua-mode-hook (lambda () (setq indent-tabs-mode t))))
+#+END_SRC
+
+Lua prettyprinter. Requires that lua is installed, as well as the
+inspect luarocks package
+
+#+BEGIN_SRC emacs-lisp
+  (defun gk/lua-pretty-print (&optional b e)
+    (interactive)
+    (if mark-active
+        (gk/lua-pretty-print-region (region-beginning) (region-end))
+      (save-excursion
+        (set-mark (point-at-bol))
+        (goto-char (point-at-eol))
+        (gk/lua-pretty-print-region (region-beginning) (region-end)))))
+
+
+    (defun gk/lua-pretty-print-region (&optional start end)
+      (interactive "r")
+      (let* ((lua-code
+              (concat "inspect = require 'inspect'\n"
+                      "local input = io.read('*a')\n"
+                      "local table, err = load('x = {' .. input .. '}; return x[1]');\n"
+                      "if err then\n"
+                      "  io.write(input)\n"
+                      "else\n"
+                      "  io.write(inspect(table()))\n"
+                      "end\n"))
+             (command (concat "lua -e \"" lua-code "\"")))
+        (shell-command-on-region start end command t t)
+        (indent-region start end)))
 #+END_SRC
 * Start-up
 ** Split window into default buffers
@@ -992,6 +1039,8 @@ idea, but it's neat sometimes.
 #+END_SRC
 ** Temp
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t)
+    (use-package flycheck
+      :ensure t
+      :config
+      (global-flycheck-mode t))
 #+END_SRC
