@@ -2,8 +2,8 @@
 
 # Ensure (server-start) is added in your emacs init script.
 
-EMACS=/Applications/Emacs.app/Contents/MacOS/Emacs
-EMACSCLIENT=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
+EMACS=$(emacs)
+EMACSCLIENT=$(emacsclient)
 
 # test if client already exists
 $EMACSCLIENT -e "(frames-on-display-list)" &>/dev/null

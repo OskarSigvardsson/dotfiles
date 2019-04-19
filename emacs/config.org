@@ -8,12 +8,44 @@ Fix the path so that homebrew stuff is included.
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
 #+END_SRC
 
+** WSL handling
+Set a a special variable to indicate that we're on WSL. It is detected
+by checking if the folder "/mnt/c" exists. Also creates c:/emacs
+directory for emacs communication
+
+#+BEGIN_SRC emacs-lisp
+  (setq emacs-on-wsl (file-directory-p "/mnt/c"))
+  (setq emacs-wsl-directory "/mnt/c/emacs")
+
+  (when emacs-on-wsl (make-directory emacs-wsl-directory t))
+
+  (defun gk/emacs-wsl-delete-server-file ()
+    "Delete the server file from windows"
+    (delete-file (gk/emacs-wsl-server-file)))
+
+  (defun gk/emacs-wsl-server-file ()
+    "The file containing server details on WSL"
+    (concat (file-name-as-directory emacs-wsl-directory) "server"))
+
+  (defun gk/emacs-wsl-copy-server-file ()
+    "Copy the server file from WSL to windows. Used in server-mode-hook"
+    (let ((source (concat (file-name-as-directory server-auth-dir) "server"))
+          (destination (gk/emacs-wsl-server-file)))
+      (if server-mode (copy-file source destination t) (gk/emacs-wsl-delete-server-file))))
+
+  (when emacs-on-wsl
+    (setq server-use-tcp t)
+
+    (add-hook 'server-mode-hook 'gk/emacs-wsl-copy-server-file)
+    (add-hook 'kill-emacs-hook 'gk/emacs-wsl-delete-server-file))
+#+END_SRC
+
 ** Start server
 Start the server so that you can use emacsclient. To edit a file from
 the terminal use `emacs-edit`
 
 #+BEGIN_SRC emacs-lisp
-  (server-start)
+  (server-mode 1)
 #+END_SRC
 ** Custom file
 Don't want the custom file polluting the main config file
@@ -279,24 +311,55 @@ implementation of this, it changes the font size buffer-locally.
     (gk/increase-default-font-size (- 0 (or step 10))))
 #+END_SRC
 
+** Show cotton logs
+#+BEGIN_SRC emacs-lisp
+(defun gk/show-cotton-log ()
+  (interactive)
+  (let* ((directory "/mnt/c/Users/Oskar Sigvardsson/Desktop/Cotton Juce 5 Logs/")
+		 (files (directory-files directory))
+		 (latest-file (seq-reduce (lambda (a b) (if (string< a b) b a)) files ""))
+		 (path (concat directory latest-file)))
+	(when (> (length latest-file) 5)
+	  (find-file path)
+	  (read-only-mode t)
+	  (end-of-buffer t))
+	  (auto-revert-tail-mode t)))
+#+END_SRC
+
 * Look options
 ** Theme
 Keep switching these...
 *** Base16
 #+BEGIN_SRC emacs-lisp
-  (use-package base16-theme
+  ;; (use-package base16-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq base16-distinct-fringe-background nil)
+  ;;   (load-theme 'base16-gruvbox-dark-hard t))
+#+END_SRC
+*** Gruvbox
+#+BEGIN_SRC emacs-lisp
+  (use-package gruvbox-theme
     :ensure t
     :config
-    (setq base16-distinct-fringe-background nil)
-    (load-theme 'base16-gruvbox-dark-hard t))
+    (load-theme 'gruvbox t)
+
+    ; I don't quite understand why, but if this runs synchronously it
+    ; can't find the faces
+    (run-at-time 1 nil
+      (lambda()
+        (let ((diff-red    "#650004")
+              (diff-green  "#555100")
+              (diff-yellow "#5c3c00"))
+          (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
+          (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
+          (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
+          (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
+          (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
+          (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)))))
 #+END_SRC
 *** Others
 #+BEGIN_SRC emacs-lisp
-
-;(use-package gruvbox-theme
-;  :ensure t
-;  :config
-;  (load-theme 'gruvbox t))
 ; (use-package solarized-theme
 ;   :ensure t
 ;   :config
@@ -490,6 +553,7 @@ Yas, queen.
           ledger-reconcile-buffer-payee-max-chars 20
           ledger-reconcile-default-commodity "kr")
 
+    (add-to-list 'evil-emacs-state-modes 'ledger-mode)
     (add-to-list 'evil-emacs-state-modes 'ledger-reconcile-mode)
     (add-to-list 'evil-emacs-state-modes 'ledger-report-mode))
 #+END_SRC
@@ -531,14 +595,66 @@ For the modeline
   (use-package telephone-line
     :ensure t
     :config
+
+    (defface telephone-line-modified
+      '((t (:background "dark blue" :inherit mode-line)))
+      "Face for indicating modified buffers"
+      :group 'telephone-line)
+
+    (defcustom telephone-line-modified-text
+      "*"
+      "Text to indicate a buffer is modified"
+      :group 'telephone-line
+      :type 'string)
+
+    (telephone-line-defsegment* telephone-line-is-modified-segment ()
+      (when (buffer-modified-p) telephone-line-modified-text))
+
+    (defun telephone-line-modified-face (active)
+      (cond ((not active) 'mode-line-inactive)
+            ((buffer-modified-p) 'telephone-line-modified)
+            (t 'mode-line)))
+
+    (add-to-list 'telephone-line-faces '(modified . telephone-line-modified-face))
+
     (setq telephone-line-primary-left-separator 'telephone-line-identity-right
           telephone-line-secondary-left-separator 'telephone-line-flat
           telephone-line-primary-right-separator 'telephone-line-identity-left
           telephone-line-secondary-right-separator 'telephone-line-flat
           telephone-line-height 50)
+
+                                          ; (add-to-list 'telephone-line-lhs '(nil . (telephone-line-is-modified-segment)))
+
+    (setq telephone-line-lhs
+          (cons (car telephone-line-lhs)
+                (cons '(modified . (telephone-line-is-modified-segment))
+                      (cdr telephone-line-lhs))))
+
     (telephone-line-mode 1))
 #+END_SRC
 
+** Vdiff
+#+BEGIN_SRC emacs-lisp
+  (use-package vdiff
+    :ensure t
+    :config
+    (setq vdiff-subtraction-fill-char ? )
+    (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map))
+  ;; (use-package vdiff
+  ;;   :ensure t)
+
+  ;; (use-package vdiff-magit
+  ;;   :ensure t
+  ;;   :config
+
+  ;;   (define-key magit-mode-map "e" 'vdiff-magit-dwim)
+  ;;   (define-key magit-mode-map "E" 'vdiff-magit)
+  ;;   (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
+  ;;   (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
+  ;;   (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
+  ;;   (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
+
+#+END_SRC
 * Helm
 ** Load
 
@@ -907,22 +1023,22 @@ Flycheck off for now, it's buggy with omnisharp
 I forget why, but i need to set this path for some reason.
 
 #+BEGIN_SRC emacs-lisp
-  (setenv "PATH"
-          (concat
-           (getenv "PATH")
-           ":/Library/Frameworks/Mono.framework/Versions/Current/Commands"))
+  ;; (setenv "PATH"
+  ;;         (concat
+  ;;          (getenv "PATH")
+  ;;          ":/Library/Frameworks/Mono.framework/Versions/Current/Commands"))
 #+END_SRC
 
 Use omnisharp
 
 #+BEGIN_SRC emacs-lisp
-  (use-package omnisharp
-    :ensure t
-    :config
-    (add-hook 'csharp-mode-hook 'omnisharp-mode)
-    ; (eval-after-load 'company
-    ;   '(add-to-list 'company-backends 'company-omnisharp))
-    )
+  ;; (use-package omnisharp
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  ;;   ; (eval-after-load 'company
+  ;;   ;   '(add-to-list 'company-backends 'company-omnisharp))
+  ;;   )
 
 #+END_SRC
 
@@ -1032,7 +1148,8 @@ inspect luarocks package
       (split-window-right)
       (switch-to-buffer "*scratch*")
       (other-window 1 nil)
-      (find-file org-default-notes-file)
+      (switch-to-buffer "*scratch*")
+      ; (find-file org-default-notes-file)
       (other-window 1 nil))
 
     (default-window-setup)

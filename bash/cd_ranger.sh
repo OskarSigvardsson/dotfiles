@@ -11,7 +11,7 @@
 
 function rd {
     tempfile="$(mktemp -t tmp.XXXXXX)"
-    /usr/local/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+    ranger --choosedir="$tempfile" "${@:-$(pwd)}"
     test -f "$tempfile" &&
     if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
         cd -- "$(cat "$tempfile")"

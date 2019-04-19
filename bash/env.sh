@@ -10,6 +10,9 @@ export LANG=en_US.UTF-8
 # My dotfiles bin/
 export PATH="$DOTFILES/bin:$PATH"
 
+# Home folder bin/
+export PATH="$HOME/bin:$PATH"
+
 # Cargo bin
 export PATH="$HOME/.cargo/bin:$PATH"
 

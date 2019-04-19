@@ -32,23 +32,23 @@ Plugin 'junegunn/goyo.vim'
 Plugin 'haya14busa/vim-gtrans'
 
 
-if empty($VIM_LIGHT)
-    if !has('nvim')
-        Plugin 'Valloric/YouCompleteMe'
-        Plugin 'rdnetto/YCM-Generator'
-        "Plugin 'OmniSharp/omnisharp-vim'
-        Plugin 'tpope/vim-dispatch'
-    endif
-
-	Plugin 'airblade/vim-gitgutter'
-    Plugin 'vim-syntastic/syntastic'
-    Plugin 'vim-scripts/taglist.vim'
-    Plugin 'majutsushi/tagbar'
-    Plugin 'vim-scripts/ShaderHighLight'
-    Plugin 'qualiabyte/vim-colorstepper'
-    Plugin 'justinmk/vim-sneak'
-    "Plugin 'SirVer/ultisnips'
-endif
+" if empty($VIM_LIGHT)
+    " if !has('nvim')
+        " Plugin 'Valloric/YouCompleteMe'
+        " Plugin 'rdnetto/YCM-Generator'
+        " "Plugin 'OmniSharp/omnisharp-vim'
+        " Plugin 'tpope/vim-dispatch'
+    " endif
+" 
+	" Plugin 'airblade/vim-gitgutter'
+    " Plugin 'vim-syntastic/syntastic'
+    " Plugin 'vim-scripts/taglist.vim'
+    " Plugin 'majutsushi/tagbar'
+    " " Plugin 'vim-scripts/ShaderHighLight'
+    " Plugin 'qualiabyte/vim-colorstepper'
+    " Plugin 'justinmk/vim-sneak'
+    " "Plugin 'SirVer/ultisnips'
+" endif
 
 " Colorschemes
 Plugin 'vim-scripts/obsidian2.vim'
