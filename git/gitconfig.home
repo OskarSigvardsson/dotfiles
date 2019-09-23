@@ -1,6 +1,7 @@
 [core]
 	excludesfile = $HOME/.gitignore_global
 	autocrlf = input
+	filemode = false
 [user]
 	name = Oskar Sigvardsson
 	email = oskarsigvardsson@gmail.com

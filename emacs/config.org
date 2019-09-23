@@ -127,6 +127,19 @@ annoying
       ad-do-it))
 #+END_SRC
 
+Keypad-dot is period, not a comma 
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<kp-delete>") ".")
+#+END_SRC
+
+F11/F12 to start/stop the profiler
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<f11>") (lambda () (interactive) (profiler-start 'cpu)))
+  (global-set-key (kbd "<f12>") (lambda () (interactive) (profiler-report) (profiler-stop)))
+#+END_SRC
+
 ** Truncate lines
 No wrapping, basically. I'm not sure I like this for every buffer,
 maybe just code?
@@ -215,6 +228,31 @@ default.
 #+BEGIN_SRC emacs-lisp
   (ido-mode t)
 #+END_SRC
+** Enable recentf
+#+BEGIN_SRC emacs-lisp
+  (recentf-mode)
+#+END_SRC
+** Adjust garbage collection settings
+When profiling, "Automatic GC" shows up every time with like 20% of
+the time. The original GC threshold is like 800kb, which is not very
+much. The downside of setting it to a larger value is that each
+individual garbage collection might take far longer, even if they are
+way less frequent. 
+
+To prevent that, set an idle timer that runs the garbage collection
+after 30 seconds of idling. If emacs idles for 30 seconds, it's
+probably not in focus (or the computer is locked), so it's fine to run
+GC, regardless of how long it takes.
+
+Setting the threshold to 1 gigabyte and running GC in an idle timer
+will hopefully both prevent emacs from taking up too much memory, as
+well as preventing GC from running while typing. 
+
+#+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold (* 1024 1024 1024))
+  (run-with-idle-timer 15 t #'garbage-collect)
+#+END_SRC
+
 * Custom functions
 ** Move lines up/down
 Move lines up and down. I usually bind these to Alt+j/k in normal
@@ -260,15 +298,14 @@ normal state.
     (save-excursion
       (let ((start (point))
             (end (progn
-                   (re-search-forward "[0-9]*" (line-end-position) t)
+            (re-search-forward "[0-9]*\\(.[0-9]*\\)?" (line-end-position) t)
                    (point))))
         (kill-region start end)))
     (calc)
-    (calc-yank 10))
+    (calc-yank 0))
 #+END_SRC
- 
-*** TODO make it work for floats
 
+*** DONE make it work for floats
 ** Show face under cursor
 #+BEGIN_SRC emacs-lisp
   (defun gk/what-face (pos)
@@ -311,21 +348,25 @@ implementation of this, it changes the font size buffer-locally.
     (gk/increase-default-font-size (- 0 (or step 10))))
 #+END_SRC
 
-** Show cotton logs
-#+BEGIN_SRC emacs-lisp
-(defun gk/show-cotton-log ()
-  (interactive)
-  (let* ((directory "/mnt/c/Users/Oskar Sigvardsson/Desktop/Cotton Juce 5 Logs/")
-		 (files (directory-files directory))
-		 (latest-file (seq-reduce (lambda (a b) (if (string< a b) b a)) files ""))
-		 (path (concat directory latest-file)))
-	(when (> (length latest-file) 5)
-	  (find-file path)
-	  (read-only-mode t)
-	  (end-of-buffer t))
-	  (auto-revert-tail-mode t)))
-#+END_SRC
+** Rename and move open buffer file
+From [[https://stackoverflow.com/a/384346/220961][stack overflow]]: 
 
+#+BEGIN_SRC emacs-lisp
+  (defun gk/rename-file-and-buffer (new-name)
+    "Renames both current buffer and file it's visiting to NEW-NAME."
+    (interactive "sNew name: ")
+    (let ((name (buffer-name))
+          (filename (buffer-file-name)))
+      (if (not filename)
+          (message "Buffer '%s' is not visiting a file!" name)
+        (if (get-buffer new-name)
+            (message "A buffer named '%s' already exists!" new-name)
+          (progn
+            (rename-file filename new-name 1)
+            (rename-buffer new-name)
+            (set-visited-file-name new-name)
+            (set-buffer-modified-p nil))))))
+#+END_SRC
 * Look options
 ** Theme
 Keep switching these...
@@ -465,17 +506,18 @@ Company for autocompletion
   (use-package company
     :ensure t
     :config
-    (global-company-mode t)
+    ; (global-company-mode t)
 
     ; (add-to-list 'company-backends 'company-files)
 
     ;; Limit backends, tabnine will do most of the work
-    ;; (setq company-backends '(company-capf company-files))
+    (setq company-backends '(company-capf company-files))
+
 
     (add-hook 'text-mode-hook (lambda () (company-mode -1)))
 
     ;; Trigger completion immediately.
-    (setq-default company-idle-delay 0.25)
+    (setq-default company-idle-delay 0.1)
 
     ;; Number the candidates (use M-1, M-2 etc to select completions).
     (setq company-show-numbers t)
@@ -488,6 +530,7 @@ Company for autocompletion
             company-pseudo-tooltip-frontend
             company-echo-metadata-frontend)))
 #+END_SRC
+
 ** Projectile
 
 #+BEGIN_SRC emacs-lisp
@@ -508,32 +551,12 @@ Company for autocompletion
     (add-to-list 'magit-section-initial-visibility-alist '(stashes . hide)))
 #+END_SRC
 
-** Yasnippet
-Yas, queen.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :config
-    (use-package yasnippet-snippets
-      :ensure t)
-
-    ;(yas-global-mode 1)
-    )
-#+END_SRC
-
-*** TODO get better at snippets. figure out c for-snippet
 ** which-key
 
 #+BEGIN_SRC emacs-lisp
     (use-package which-key
       :ensure t
       :config (which-key-mode 1))
-#+END_SRC
-** helm-ls-git
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-ls-git
-    :ensure t)
 #+END_SRC
 ** ledger
 #+BEGIN_SRC emacs-lisp
@@ -580,10 +603,10 @@ Expands region by semantic units
 Lets try this thing out!
 
 #+BEGIN_SRC emacs-lisp
-  (use-package company-tabnine
-    :ensure t
-    :config
-    (add-to-list 'company-backends #'company-tabnine t))
+  ;; (use-package company-tabnine
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-to-list 'company-backends #'company-tabnine t))
 #+END_SRC
 
 To install binary, run `M-x company-tabnine-install-binary`
@@ -620,15 +643,13 @@ For the modeline
     (setq telephone-line-primary-left-separator 'telephone-line-identity-right
           telephone-line-secondary-left-separator 'telephone-line-flat
           telephone-line-primary-right-separator 'telephone-line-identity-left
-          telephone-line-secondary-right-separator 'telephone-line-flat
-          telephone-line-height 50)
-
-                                          ; (add-to-list 'telephone-line-lhs '(nil . (telephone-line-is-modified-segment)))
+          telephone-line-secondary-right-separator 'telephone-line-flat)
 
     (setq telephone-line-lhs
-          (cons (car telephone-line-lhs)
-                (cons '(modified . (telephone-line-is-modified-segment))
-                      (cdr telephone-line-lhs))))
+          '((evil telephone-line-evil-tag-segment)
+            (modified telephone-line-is-modified-segment)
+            (accent telephone-line-vc-segment telephone-line-erc-modified-channels-segment telephone-line-process-segment)
+            (nil telephone-line-buffer-segment)))
 
     (telephone-line-mode 1))
 #+END_SRC
@@ -655,61 +676,80 @@ For the modeline
   ;;   (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
 
 #+END_SRC
+
+** Hydra
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :ensure t
+    :config
+    (defhydra hydra-zoom (global-map "<f6>")
+      "zoom"
+      ("j" gk/increase-default-font-size)
+      ("k" gk/decrease-default-font-size)))
+#+END_SRC
 * Helm
-** Load
-
 #+BEGIN_SRC emacs-lisp
-
   (use-package helm
-    :ensure t)
+    :ensure t
+    :config
 
-#+END_SRC
+    (general-define-key
+     "M-x"     'helm-M-x
+     "C-M-x"   'execute-extended-command
+     "C-h a"   'helm-apropos
+     "C-x b"   'helm-mini)
 
-** Keymaps
+    (use-package helm-ls-git
+      :ensure t)
 
-#+BEGIN_SRC emacs-lisp
-  (general-define-key
-   "M-x"     'helm-M-x
-   "C-M-x"   'execute-extended-command
-   "C-h a"   'helm-apropos
-   "C-x b"   'helm-mini)
-#+END_SRC
+    (defun helm-rg-git-root (arg)
+      "Run helm-do-grep-ag in git root level, if there is one, otherwise default-directory"
+      (interactive "P")
+      (let* ((git-root (magit-toplevel))
+             (directory (if git-root git-root default-directory)))
+        (helm-grep-ag directory arg)))
 
-** Grepping
-*** Search entire git repo
+    (setq helm-grep-ag-command
+          "rg --color=always --smart-case --no-heading --line-number %s %s %s")
 
-#+BEGIN_SRC emacs-lisp
+    (defhydra hydra-helm (:hint nil :color pink)
+      "
+                                                                            ╭──────┐
+     Navigation   Other  Sources     Mark             Do             Help   │ Helm │
+    ╭───────────────────────────────────────────────────────────────────────┴──────╯
+          ^_k_^         _K_       _p_   [_m_] mark         [_v_] view         [_H_] helm help
+          ^^↑^^         ^↑^       ^↑^   [_t_] toggle all   [_d_] kill         [_s_] source help
+      _h_ ←   → _l_     _c_       ^ ^   [_u_] unmark all   [_f_] follow: %(helm-attr 'follow)
+          ^^↓^^         ^↓^       ^↓^    ^ ^               [_y_] yank selection
+          ^_j_^         _J_       _n_    ^ ^               [_w_] toggle windows
+    --------------------------------------------------------------------------------
+          "
+      ("<tab>" helm-keyboard-quit "back" :exit t)
+      ("<escape>" nil "quit")
+      ("\\" (insert "\\") "\\" :color blue)
+      ("h" helm-beginning-of-buffer)
+      ("j" helm-next-line)
+      ("k" helm-previous-line)
+      ("l" helm-end-of-buffer)
+      ("g" helm-beginning-of-buffer)
+      ("G" helm-end-of-buffer)
+      ("n" helm-next-source)
+      ("p" helm-previous-source)
+      ("K" helm-scroll-other-window-down)
+      ("J" helm-scroll-other-window)
+      ("c" helm-recenter-top-bottom-other-window)
+      ("m" helm-toggle-visible-mark)
+      ("t" helm-toggle-all-marks)
+      ("u" helm-unmark-all)
+      ("H" helm-help)
+      ("s" helm-buffer-help)
+      ("v" helm-execute-persistent-action)
+      ("d" helm-buffer-run-kill-persistent)
+      ("y" helm-yank-selection)
+      ("w" helm-toggle-resplit-and-swap-windows)
+      ("f" helm-follow-mode))
 
-(defun helm-rg-git-root (arg)
-  "Run helm-do-grep-ag in git root level, if there is one, otherwise default-directory"
-  (interactive "P")
-  (let* ((git-root (magit-toplevel))
-         (directory (if git-root git-root default-directory)))
-    (helm-grep-ag directory arg)))
-
-#+END_SRC
-
-*** Use rg for grepping
-
-#+BEGIN_SRC emacs-lisp
-  (setq helm-grep-ag-command
-        "rg --color=always --smart-case --no-heading --line-number %s %s %s")
-#+END_SRC
-
-** Use helm-ls-git
-#+BEGIN_SRC emacs-lisp
-  ;(use-package helm-ls-git
-  ;  :ensure t
-  ;  :config
-  ;  (helm-ls-git-build-ls-git-source)
-  ;  (add-to-list 'helm-mini-default-sources 'helm-source-ls-git t))
-#+END_SRC
-** Customize helm-mini
-#+BEGIN_SRC emacs-lisp
-  ;(setq helm-mini-default-sources
-  ;      '(helm-source-buffers-list
-  ;        helm-source-recentf
-  ;        helm-source-buffer-not-found))
+    (define-key helm-map (kbd "C-k") 'hydra-helm/body))
 #+END_SRC
 
 * Evil mode
@@ -736,7 +776,7 @@ For the modeline
      ",c"                'gk/kill-number-into-calc
      "√"                 'gk/move-line-down
      "ª"                 'gk/move-line-up
-     "π"                 'evil-paste-increment-and-yank
+     "M-p"               'evil-paste-increment-and-yank
      "S"                 'evil-stamp
      "+"                 'flycheck-next-error
      "-"                 'flycheck-previous-error
@@ -992,10 +1032,14 @@ mode.
 #+BEGIN_SRC emacs-lisp
   (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin"))
 #+END_SRC
+
+** Reveal
+
 * Languages
 ** Indentation
 #+BEGIN_SRC emacs-lisp
   (c-set-offset 'arglist-intro '+)
+  (c-set-offset 'inline-open '0)
   (c-set-offset 'arglist-cont '0)
   (c-set-offset 'arglist-cont-nonempty '+)
   (c-set-offset 'arglist-close '+)
@@ -1043,9 +1087,11 @@ Use omnisharp
 #+END_SRC
 
 ** C
-*** Indendtation
+"Linux" style for the braces, and basic offset of 4
+
 #+BEGIN_SRC emacs-lisp
-  (setq c-basic-offset 4)
+  (setq c-default-style "linux"
+        c-basic-offset 4)
 #+END_SRC
 
 ** C++
@@ -1053,8 +1099,8 @@ C/C++ language server
 
 #+BEGIN_SRC emacs-lisp
 
-  ;; (use-package lsp-mode
-  ;;   :ensure t)
+  (use-package lsp-mode
+    :ensure t)
 
   ;; (use-package cquery
   ;;   :ensure t
@@ -1064,9 +1110,9 @@ C/C++ language server
   ;;   (add-hook 'c-mode-hook 'lsp-cquery-enable)
   ;;   (add-hook 'c++-mode-hook 'lsp-cquery-enable))
 
-  ;; (use-package company-lsp
-  ;;   :ensure t
-  ;;   :config (push 'company-lsp company-backends))
+  (use-package company-lsp
+    :ensure t
+    :config (push 'company-lsp company-backends))
 #+END_SRC
 ** Shaderlab
 #+BEGIN_SRC emacs-lisp
@@ -1135,29 +1181,73 @@ inspect luarocks package
         (shell-command-on-region start end command t t)
         (indent-region start end)))
 #+END_SRC
+
+* Cotton stuff
+** Show cotton logs
+#+BEGIN_SRC emacs-lisp
+  (defun gk/latest-cotton-log-file ()
+    (let* ((directory "/mnt/c/Users/Oskar Sigvardsson/Desktop/Cotton Juce 5 Logs/")
+           (files (directory-files directory))
+           (latest-file (seq-reduce (lambda (a b) (if (string< a b) b a)) files "")))
+      (concat directory latest-file)))
+
+  (defun gk/open-cotton-log-file ()
+    (interactive)
+    (find-file (gk/latest-cotton-log-file)))
+
+  (defun gk/show-cotton-log ()
+    (interactive)
+    (find-file (gk/latest-cotton-log-file))
+    (read-only-mode t)
+    (end-of-buffer t)
+    (auto-revert-tail-mode t))
+#+END_SRC
+** Exclude cotton logs from recentf
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'recentf-exclude ".*Cotton Juce 5 Logs.*")
+#+END_SRC
+** Remove clang from company
+Really slow on cotton files, and it doesn't work anyway. I should find
+a way to fix that...
+
+#+BEGIN_SRC emacs-lisp
+  (setq company-backends (delete 'company-clang company-backends))
+#+END_SRC
+
+Try this lsp thing
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package lsp-mode
+  ;;   :ensure t
+  ;;   :config
+
+  ;;   (use-package company-lsp
+  ;;     :ensure t
+  ;;     :config
+  ;;     (add-to-list 'company-backends 'company-lsp))
+
+  ;;   (use-package lsp-ui
+  ;;     :ensure t
+  ;;     :config
+  ;;     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  ;;   (add-hook 'c++-mode-hook #'lsp))
+#+END_SRC
 * Start-up
 ** Split window into default buffers
 #+BEGIN_SRC emacs-lisp
-    (setq inhibit-splash-screen t
-          inhibit-startup-message t
-          inhibit-startup-echo-area-message t)
+  (setq inhibit-splash-screen t
+        inhibit-startup-message t
+        inhibit-startup-echo-area-message t)
 
-    (defun default-window-setup ()
-      (interactive)
-      (delete-other-windows)
-      (split-window-right)
-      (switch-to-buffer "*scratch*")
-      (other-window 1 nil)
-      (switch-to-buffer "*scratch*")
-      ; (find-file org-default-notes-file)
-      (other-window 1 nil))
+  (defun default-window-setup ()
+    (interactive)
+    (delete-other-windows)
+    (split-window-right)
+    (switch-to-buffer "*scratch*")
+    (other-window 1 nil)
+    ; something else than scratch on left?
+    (switch-to-buffer "*scratch*")
+    ; (find-file org-default-notes-file)
+    (other-window 1 nil))
 
-    (default-window-setup)
-#+END_SRC
-** Temp
-#+BEGIN_SRC emacs-lisp
-    (use-package flycheck
-      :ensure t
-      :config
-      (global-flycheck-mode t))
+  (default-window-setup)
 #+END_SRC
