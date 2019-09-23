@@ -110,9 +110,9 @@ Right Cmd is meta, option is just option. Remapping escape to be more
 impactful.
 
 #+BEGIN_SRC emacs-lisp
-  (setq mac-option-modifier nil)
+  (setq mac-option-modifier 'meta)
   (setq mac-right-command-modifier 'meta)
-  (setq mac-right-option-modifier 'meta)
+  (setq mac-right-option-modifier nil)
 
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
@@ -646,9 +646,9 @@ For the modeline
 
     (add-to-list 'telephone-line-faces '(modified . telephone-line-modified-face))
 
-    (setq telephone-line-primary-left-separator 'telephone-line-identity-right
+    (setq telephone-line-primary-left-separator 'telephone-line-flat
           telephone-line-secondary-left-separator 'telephone-line-flat
-          telephone-line-primary-right-separator 'telephone-line-identity-left
+          telephone-line-primary-right-separator 'telephone-line-flat
           telephone-line-secondary-right-separator 'telephone-line-flat)
 
     (setq telephone-line-lhs

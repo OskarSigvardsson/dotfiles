@@ -1,0 +1,7 @@
+#!/bin/bash
+
+emacsclient "$@"
+
+if [[ $? != 0 ]]; then
+	vim "$@"
+fi
