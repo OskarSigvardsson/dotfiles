@@ -30,9 +30,9 @@ function _update_ps1() {
 
 	# actually, lets try something a little bit more minimalistic for now...
 	if [[ $? == 0 ]]; then
-		export PS1=" \[\e[00;36;1m\]λ \W \[\e[0m\]"
+		export PS1=" \[\e[00;36;1m\]λ \W > \[\e[0m\]"
 	else
-		export PS1=" \[\e[00;31;1m\]λ \W \[\e[0m\]"
+		export PS1=" \[\e[00;31;1m\]λ \W > \[\e[0m\]"
 	fi 
 }
 
