@@ -436,9 +436,9 @@ The most important setting of all!
 Use italics and bold more liberally.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (set-face-attribute 'font-lock-type-face nil :slant 'italic)
-  ;; (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
-  ;; (set-face-attribute 'font-lock-keyword-face nil :weight 'bold)
+  (set-face-attribute 'font-lock-type-face nil :slant 'italic)
+  (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil :weight 'bold)
 #+END_SRC
 
 The "outline" faces are what's used for org headlines (at least in
@@ -447,14 +447,14 @@ which leads to various org headlines being bold and italic. So,
 hard-set these headlines to be regular weight and slant.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (set-face-attribute 'outline-1 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-2 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-3 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-4 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-5 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-6 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-7 nil :weight 'normal :slant 'normal)
-  ;; (set-face-attribute 'outline-8 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-1 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-2 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-3 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-4 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-5 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-6 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-7 nil :weight 'normal :slant 'normal)
+  (set-face-attribute 'outline-8 nil :weight 'normal :slant 'normal)
 #+END_SRC
 ** GUI
 No toolbar or scrollbar. Maybe no fringe?
