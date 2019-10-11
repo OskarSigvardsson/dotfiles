@@ -2,6 +2,13 @@ if [ -r ~/.bashrc ]; then
    source ~/.bashrc
 fi
 
+# Aliases
+alias cat="bat"
+alias less="bat"
+alias ls="exa"
+alias tree="exa --tree"
+alias rg="rg -p"
+
 # Compatible with ranger 1.4.2 through 1.7.*
 #
 # Automatically change the directory in bash after closing ranger
