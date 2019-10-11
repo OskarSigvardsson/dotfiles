@@ -24,7 +24,7 @@
  '(neo-window-fixed-size nil)
  '(package-selected-packages
    (quote
-	(col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine company-lsp base16-theme)))
+	(evil-cleverparens paredit geiser magit-lfs col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine company-lsp base16-theme)))
  '(recentf-max-saved-items 100)
  '(safe-local-variable-values
    (quote
