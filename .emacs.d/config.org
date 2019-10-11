@@ -2,10 +2,17 @@ Oskars emacs configuration file
 
 * Basic emacs options
 ** Fix path
-Fix the path so that homebrew stuff is included.
+Fix the path so that homebrew stuff is included. Also my local bin
+folder, at the top.
 
 #+BEGIN_SRC emacs-lisp
-  (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+  (defun gk/add-dir-to-path (dir)
+    "Add a single directory to both exec-path and $PATH"
+    (add-to-list 'exec-path dir)
+    (setenv "PATH" (concat dir ":" (getenv "PATH"))))
+
+  (gk/add-dir-to-path "/usr/local/bin")
+  (gk/add-dir-to-path (concat (getenv "HOME") "/bin"))
 #+END_SRC
 
 ** WSL handling
