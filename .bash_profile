@@ -49,7 +49,7 @@ fi
 
 export PS1=" \[\e[00;36;1m\]λ \W \[\e[0m\]"
 
-alias dotfiles='/usr/local/bin/git --git-dir=/Users/oskar.sigvardsson/.dotfiles/ --work-tree=/Users/oskar.sigvardsson'
+alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 if which fortune > /dev/null 2> /dev/null
 then
