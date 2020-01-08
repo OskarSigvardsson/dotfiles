@@ -4,6 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(calendar-week-start-day 1)
+ '(compilation-always-kill t)
  '(compilation-ask-about-save nil)
  '(custom-safe-themes
    (quote
@@ -24,7 +25,7 @@
  '(neo-window-fixed-size nil)
  '(package-selected-packages
    (quote
-	(evil-cleverparens paredit geiser magit-lfs col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine company-lsp base16-theme)))
+	(gnuplot gnuplot-mode quickrun transpose-frame csv-mode vdiff-hydra vdiff-magit evil-cleverparens paredit magit-lfs col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine company-lsp base16-theme)))
  '(recentf-max-saved-items 100)
  '(safe-local-variable-values
    (quote
@@ -32,6 +33,7 @@
 		   (fboundp
 			(quote rainbow-mode))
 		   (rainbow-mode 1)))))
+ '(scheme-program-name "chez")
  '(telephone-line-modified-text " ")
  '(undo-tree-enable-undo-in-region nil)
  '(vdiff-disable-folding t))

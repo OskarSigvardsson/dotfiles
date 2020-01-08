@@ -149,6 +149,43 @@ F11/F12 to start/stop the profiler
   (global-set-key (kbd "<f12>") (lambda () (interactive) (profiler-report) (profiler-stop)))
 #+END_SRC
 
+** Swap swedish keys for control characters
+I should make this into a minor mode...
+
+#+BEGIN_SRC emacs-lisp
+  (defun gk/swap-keys (k1 k2)
+    "Swap two keys on a low level"
+    (keyboard-translate k1 k2)
+    (keyboard-translate k2 k1))
+
+  (defun gk/enable-swedish-keyswap ()
+    (interactive) 
+    (gk/swap-keys ?ö ?{)
+    (gk/swap-keys ?ä ?})
+    (gk/swap-keys ?Ö ?[)
+    (gk/swap-keys ?Ä ?])
+    (gk/swap-keys ?å ?^)
+    (gk/swap-keys ?Å ?$))
+
+  (defun gk/disable-swedish-keyswap ()
+(interactive) 
+(keyboard-translate ?ö ?ö)
+    (keyboard-translate ?ä ?ä)
+    (keyboard-translate ?Ö ?Ö)
+    (keyboard-translate ?Ä ?Ä)
+    (keyboard-translate ?å ?å)
+    (keyboard-translate ?Å ?Å)
+    (keyboard-translate ?{ ?{)
+    (keyboard-translate ?} ?})
+    (keyboard-translate ?[ ?[)
+    (keyboard-translate ?] ?])
+    (keyboard-translate ?^ ?^)
+    (keyboard-translate ?$ ?$))
+
+  (gk/enable-swedish-keyswap)
+#+END_SRC
+
+*** TODO make this into a global minor "keyswap" mode
 ** Truncate lines
 No wrapping, basically. I'm not sure I like this for every buffer,
 maybe just code?
@@ -317,11 +354,23 @@ normal state.
 *** DONE make it work for floats
 ** Show face under cursor
 #+BEGIN_SRC emacs-lisp
+  (defun gk/face-at-position (pos)
+    "Find face at position"
+    (or (get-char-property (point) 'read-face-name)
+        (get-char-property (point) 'face)))
+
   (defun gk/what-face (pos)
+    "Find out what face is under the cursor"
     (interactive "d")
-    (let ((face (or (get-char-property (point) 'read-face-name)
-                    (get-char-property (point) 'face))))
-      (if face (message "Face: %s" face) (message "No face at %d" pos))))
+    (message "%s" (gk/face-at-position pos)))
+
+  (defun gk/customize-face-under-cursor (pos)
+    "Customize face under cursor"
+    (interactive "d")
+    (if-let ((face (gk/face-at-position pos)))
+        (customize-face face)
+      (message "Can't find face under cursor")))
+
 #+END_SRC
 
 ** Compile with make
@@ -376,18 +425,29 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
             (set-visited-file-name new-name)
             (set-buffer-modified-p nil))))))
 #+END_SRC
+
+** New buffer with default name
+#+BEGIN_SRC emacs-lisp
+  (defun gk/new-buffer (&optional template number)
+    (interactive)
+    (let* ((template (or template "new-buffer-%d"))
+           (number (or number 0))
+           (name (format template number)))
+      (if (get-buffer name)
+          (gk/new-buffer template (+ 1 number))
+        (progn
+          (message (format "Creating new buffer %s" name))
+          (switch-to-buffer (get-buffer-create name))))))
+#+END_SRC
+
+** Add buffer-local hook
+#+BEGIN_SRC emacs-lisp
+  (defun gk/add-buffer-local-hook (hook func)
+    (interactive "SHook: \naFunction: ")
+    (add-hook hook func nil t))
+#+END_SRC
 * Look options
 ** Theme
-Keep switching these...
-*** Base16
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package base16-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq base16-distinct-fringe-background nil)
-  ;;   (load-theme 'base16-gruvbox-dark-hard t))
-#+END_SRC
 *** Gruvbox
 #+BEGIN_SRC emacs-lisp
   (use-package gruvbox-theme
@@ -412,26 +472,6 @@ Keep switching these...
           (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
           (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)))))
 #+END_SRC   
-*** Others
-#+BEGIN_SRC emacs-lisp
-; (use-package solarized-theme
-;   :ensure t
-;   :config
-;   (setq solarized-use-variable-pitch nil
-;         solarized-scale-org-headlines nil
-;         solarized-use-more-italic t)
-;
-;   (load-theme 'solarized-dark t))
-;(use-package zerodark-theme
-;  :ensure t
-;  :config
-;  (zerodark-setup-modeline-format))
-;(use-package darktooth-theme
-;  :ensure t
-;  :config
-;  (load-theme 'darktooth t)
-;  (darktooth-modeline))
-#+END_SRC
 ** Faces
 The most important setting of all!
 
@@ -519,7 +559,7 @@ Company for autocompletion
   (use-package company
     :ensure t
     :config
-    ; (global-company-mode t)
+    (global-company-mode t)
 
     ; (add-to-list 'company-backends 'company-files)
 
@@ -554,6 +594,7 @@ Company for autocompletion
 #+END_SRC
 
 ** Magit
+
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t
@@ -571,28 +612,34 @@ Company for autocompletion
       :ensure t
       :config (which-key-mode 1))
 #+END_SRC
+
 ** ledger
+
 #+BEGIN_SRC emacs-lisp
   (use-package ledger-mode
+    ;:load-path "~/.emacs.d/extra-packages/ledger-mode"
     :ensure t
     :config
-    ; (setq-default ledger-binary-path "/usr/local/bin/ledger")
+    (when (string-equal system-type "darwin")
+      (setq-default ledger-binary-path "/usr/local/bin/ledger"))
 
-    ; (add-to-list 'evil-motion-state-modes 'ledger-report-mode)
-    ; (add-to-list 'evil-motion-state-modes 'ledger-reconcile-mode)
+    ;; (add-to-list 'evil-motion-state-modes 'ledger-report-mode)
+    ;; (add-to-list 'evil-motion-state-modes 'ledger-reconcile-mode)
 
     (setq ledger-clear-whole-transactions t
           ledger-reconcile-default-commodity "kr"
 
-          ledger-reconcile-buffer-account-max-chars 16
+          ;; ledger-reconcile-buffer-account-max-chars 16
           ledger-reconcile-buffer-line-format "%(date)s %-22(payee)s %-16(account)s %12(amount)s\n"
           ledger-reconcile-buffer-payee-max-chars 20
           ledger-reconcile-default-commodity "kr")
 
-    (add-to-list 'evil-emacs-state-modes 'ledger-mode)
-    (add-to-list 'evil-emacs-state-modes 'ledger-reconcile-mode)
-    (add-to-list 'evil-emacs-state-modes 'ledger-report-mode))
+    ;; (add-to-list 'evil-emacs-state-modes 'ledger-mode)
+    ;; (add-to-list 'evil-emacs-state-modes 'ledger-reconcile-mode)
+    ;; (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
+    )
 #+END_SRC
+
 ** neotree
 #+BEGIN_SRC emacs-lisp
     (use-package neotree
@@ -673,20 +720,17 @@ For the modeline
     :ensure t
     :config
     (setq vdiff-subtraction-fill-char ? )
-    (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map))
-  ;; (use-package vdiff
-  ;;   :ensure t)
+    (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
 
-  ;; (use-package vdiff-magit
-  ;;   :ensure t
-  ;;   :config
-
-  ;;   (define-key magit-mode-map "e" 'vdiff-magit-dwim)
-  ;;   (define-key magit-mode-map "E" 'vdiff-magit)
-  ;;   (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
-  ;;   (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
-  ;;   (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
-  ;;   (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit))
+    (use-package vdiff-magit
+      :ensure t
+      :config
+      (define-key magit-mode-map "e" 'vdiff-magit-dwim)
+      (define-key magit-mode-map "E" 'vdiff-magit)
+      (transient-suffix-put 'magit-dispatch "e" :description "vdiff (dwim)")
+      (transient-suffix-put 'magit-dispatch "e" :command 'vdiff-magit-dwim)
+      (transient-suffix-put 'magit-dispatch "E" :description "vdiff")
+      (transient-suffix-put 'magit-dispatch "E" :command 'vdiff-magit)))
 
 #+END_SRC
 
@@ -769,58 +813,51 @@ For the modeline
 ** Keymaps
 #+BEGIN_SRC emacs-lisp
   (defun evil-set-keys ()
-    (general-define-key
-     :states 'motion
-     "ö" 'evil-backward-paragraph
-     "ä" 'evil-forward-paragraph
-     "å" 'evil-first-non-blank
-     "Å" 'evil-end-of-line)
+	(general-define-key
+	 :states 'normal
+	 ",s"                'mark-whole-buffer
+	 ",f"                'helm-find-files
+	 ",p"                'helm-ls-git-ls
+	 ",b"                'helm-mini
+	 ",m"                'magit-status
+	 ",g"                'helm-rg-git-root  ; defined in helm section
+	 ",k"                'kill-this-buffer
+	 ",h"                'helm-apropos
+	 ",c"                'gk/kill-number-into-calc
+	 "√"                 'gk/move-line-down
+	 "ª"                 'gk/move-line-up
+	 "M-p"               'evil-paste-increment-and-yank
+	 "S"                 'evil-stamp
+	 "+"                 'flymake-goto-next-error
+	 "-"                 'flymake-goto-previous-error
+	 "<deletechar>"      'clear-line
+	 "<left>"            'evil-window-left
+	 "<right>"           'evil-window-right
+	 "<up>"              'evil-window-up
+	 "<down>"            'evil-window-down
+	 "<backspace>"       'evil-ex-nohighlight
+	 "RET"               'gk/insert-empty-line
+	 "z"                 'save-buffer
+	 "SPC"               'helm-M-x)
 
-    (general-define-key
-     :states 'normal
-     ",s"                'mark-whole-buffer
-     ",f"                'helm-find-files
-     ",p"                'helm-ls-git-ls
-     ",b"                'helm-mini
-     ",m"                'magit-status
-     ",g"                'helm-rg-git-root  ; defined in helm section
-     ",k"                'kill-this-buffer
-     ",h"                'helm-apropos
-     ",c"                'gk/kill-number-into-calc
-     "√"                 'gk/move-line-down
-     "ª"                 'gk/move-line-up
-     "M-p"               'evil-paste-increment-and-yank
-     "S"                 'evil-stamp
-     "+"                 'flycheck-next-error
-     "-"                 'flycheck-previous-error
-     "<deletechar>"      'clear-line
-     "<left>"            'evil-window-left
-     "<right>"           'evil-window-right
-     "<up>"              'evil-window-up
-     "<down>"            'evil-window-down
-     "<backspace>"       'evil-ex-nohighlight
-     "RET"               'gk/insert-empty-line
-     "z"                 'save-buffer
-     "SPC"               'helm-M-x)
+	(general-define-key
+	 :states 'visual
+	 "gc"   'comment-region
+	 "gC"   'uncomment-region))
 
-    (general-define-key
-     :states 'visual
-     "gc"   'comment-region
-     "gC"   'uncomment-region)
+  ;;   (general-define-key
+  ;;       :states 'insert
+  ;;       "<tab>"   'tab-to-tab-stop
+  ;;       "ö"       (lambda () (interactive) (insert "{") (indent-according-to-mode))
+  ;;       "ä"       (lambda () (interactive) (insert "}") (indent-according-to-mode))
+  ;;       "Ö"       (lambda () (interactive) (insert "["))
+  ;;       "Ä"       (lambda () (interactive) (insert "]"))
+  ;;       "{"       (lambda () (interactive) (insert "ö"))
+  ;;       "}"       (lambda () (interactive) (insert "ä"))
+  ;;       "["       (lambda () (interactive) (insert "Ö"))
+  ;;       "]"       (lambda () (interactive) (insert "Ä"))))
 
-    (general-define-key
-        :states 'insert
-        "<tab>"   'tab-to-tab-stop
-        "ö"       (lambda () (interactive) (insert "{") (indent-according-to-mode))
-        "ä"       (lambda () (interactive) (insert "}") (indent-according-to-mode))
-        "Ö"       (lambda () (interactive) (insert "["))
-        "Ä"       (lambda () (interactive) (insert "]"))
-        "{"       (lambda () (interactive) (insert "ö"))
-        "}"       (lambda () (interactive) (insert "ä"))
-        "["       (lambda () (interactive) (insert "Ö"))
-        "]"       (lambda () (interactive) (insert "Ä"))))
-
-  (add-hook 'evil-mode-hook 'evil-set-keys)
+	(add-hook 'evil-mode-hook 'evil-set-keys)
 #+END_SRC
 ** Search module
 Makes gn motion work in cgn/dgn
@@ -935,8 +972,9 @@ Initialize babel (do i need to do this?)
    '((R . t)
      (emacs-lisp . t)
      (gnuplot . t)
+     (python . t)
      (ledger . t)
-     (python . t)))
+     (shell . t)))
 #+END_SRC
 
 Don't ask for confirmation to execute stuff
@@ -1059,46 +1097,10 @@ mode.
 
 #+END_SRC
 ** C#
-Use tabs instead of spaces
-
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'csharp-mode-hook
-            (lambda ()
-            (setq indent-tabs-mode t)))
+  (use-package csharp-mode
+    :ensure t)
 #+END_SRC
-
-Flycheck off for now, it's buggy with omnisharp
-
-#+BEGIN_SRC emacs-lisp
-  ;; (add-hook 'csharp-mode-hook
-  ;;           (lambda ()
-  ;;             (flycheck-mode 1)
-  ;;             (setq flycheck-error-list-minimum-level 'error)
-  ;;             (setq flycheck-navigation-minimum-level 'error)))
-#+END_SRC
-
-I forget why, but i need to set this path for some reason.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (setenv "PATH"
-  ;;         (concat
-  ;;          (getenv "PATH")
-  ;;          ":/Library/Frameworks/Mono.framework/Versions/Current/Commands"))
-#+END_SRC
-
-Use omnisharp
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package omnisharp
-  ;;   :ensure t
-  ;;   :config
-  ;;   (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  ;;   ; (eval-after-load 'company
-  ;;   ;   '(add-to-list 'company-backends 'company-omnisharp))
-  ;;   )
-
-#+END_SRC
-
 ** C
 "Linux" style for the braces, and basic offset of 4
 
@@ -1109,24 +1111,27 @@ Use omnisharp
 
 ** C++
 C/C++ language server
-
 #+BEGIN_SRC emacs-lisp
-
-  (use-package lsp-mode
-    :ensure t)
-
-  ;; (use-package cquery
+  ;; (use-package lsp-mode
   ;;   :ensure t
   ;;   :config
-  ;;   (setq cquery-executable "/usr/local/bin/cquery"
-  ;;         cquery-extra-args '("--log-file=/tmp/cqlog.txt"))
-  ;;   (add-hook 'c-mode-hook 'lsp-cquery-enable)
-  ;;   (add-hook 'c++-mode-hook 'lsp-cquery-enable))
 
-  (use-package company-lsp
-    :ensure t
-    :config (push 'company-lsp company-backends))
+  ;;   (use-package company-lsp
+  ;;     :ensure t
+  ;;     :config
+  ;;     (add-to-list 'company-backends 'company-lsp))
+
+  ;;   ;; (use-package flycheck
+  ;;   ;;   :ensure t
+  ;;   ;;   :config
+  ;;     ;; (use-package lsp-ui
+  ;;     ;;   :ensure t
+  ;;     ;;   :config
+  ;;     ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
+
+  ;;   (add-hook 'c++-mode-hook #'lsp))
 #+END_SRC
+
 ** Shaderlab
 #+BEGIN_SRC emacs-lisp
   (use-package shader-mode
@@ -1195,11 +1200,28 @@ inspect luarocks package
         (indent-region start end)))
 #+END_SRC
 
+** Scheme
+#+BEGIN_SRC emacs-lisp
+  (use-package paredit
+    :ensure t
+    :config
+    (add-hook 'scheme-mode-hook 'paredit-mode))
+
+  (use-package evil-cleverparens
+    :ensure t
+    :config
+    (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
+#+END_SRC
 * Cotton stuff
 ** Show cotton logs
 #+BEGIN_SRC emacs-lisp
+  (defun gk/cotton-directory ()
+    (if (string-equal system-type "darwin")
+        "/Users/oskar.sigvardsson/Desktop/Cotton Juce 5 Logs/"
+        "/mnt/c/Users/Oskar Sigvardsson/Desktop/Cotton Juce 5 Logs/"))
+
   (defun gk/latest-cotton-log-file ()
-    (let* ((directory "/mnt/c/Users/Oskar Sigvardsson/Desktop/Cotton Juce 5 Logs/")
+    (let* ((directory (gk/cotton-directory))
            (files (directory-files directory))
            (latest-file (seq-reduce (lambda (a b) (if (string< a b) b a)) files "")))
       (concat directory latest-file)))
@@ -1225,24 +1247,6 @@ a way to fix that...
 
 #+BEGIN_SRC emacs-lisp
   (setq company-backends (delete 'company-clang company-backends))
-#+END_SRC
-
-Try this lsp thing
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package lsp-mode
-  ;;   :ensure t
-  ;;   :config
-
-  ;;   (use-package company-lsp
-  ;;     :ensure t
-  ;;     :config
-  ;;     (add-to-list 'company-backends 'company-lsp))
-
-  ;;   (use-package lsp-ui
-  ;;     :ensure t
-  ;;     :config
-  ;;     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-  ;;   (add-hook 'c++-mode-hook #'lsp))
 #+END_SRC
 * Start-up
 ** Split window into default buffers
