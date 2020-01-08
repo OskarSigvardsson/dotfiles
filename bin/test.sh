@@ -1,1 +1,0 @@
-echo "$@" > /tmp/arguments.txt

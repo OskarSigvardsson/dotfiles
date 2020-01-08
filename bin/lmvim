@@ -1,2 +1,0 @@
-#!/bin/sh
-VIM_LIGHT=1 mvim "$@"

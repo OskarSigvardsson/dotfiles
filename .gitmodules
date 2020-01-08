@@ -1,4 +1,0 @@
-
-[submodule "bash/bash-powerline"]
-	path = bash/bash-powerline
-	url = https://github.com/riobard/bash-powerline
