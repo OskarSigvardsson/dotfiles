@@ -51,6 +51,8 @@
  '(line-number ((t (:background "#282828" :foreground "#7c6f64"))))
  '(minibuffer-prompt ((t (:foreground "#83a598" :weight bold))))
  '(nobreak-space ((t (:inherit escape-glyph :underline nil))))
+ '(org-block-begin-line ((t (:inherit org-meta-line :background "#3c3836"))))
+ '(org-block-end-line ((t (:inherit org-meta-line :background "#3c3836"))))
  '(org-checkbox-statistics-done ((t (:inherit org-done :weight bold))))
  '(org-done ((t (:foreground "#b8bb26" :weight bold))))
  '(org-link ((t (:foreground "#83a598" :underline t))))

@@ -498,6 +498,7 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
           (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
           (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)))))
 #+END_SRC   
+
 ** Faces
 The most important setting of all!
 
@@ -550,6 +551,7 @@ But no line numbers in magit
   (add-hook 'magit-pre-display-buffer-hook
             (lambda () (setq display-line-numbers nil)))
 #+END_SRC
+
 Highlight current line
 
 #+BEGIN_SRC emacs-lisp
