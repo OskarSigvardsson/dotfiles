@@ -25,7 +25,7 @@
  '(neo-window-fixed-size nil)
  '(package-selected-packages
    (quote
-	(gnuplot gnuplot-mode quickrun transpose-frame csv-mode vdiff-hydra vdiff-magit evil-cleverparens paredit magit-lfs col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine company-lsp base16-theme)))
+	(lua-mode csharp-mode evil-indent-plus helm vdiff telephone-line magit company gnuplot gnuplot-mode quickrun transpose-frame csv-mode vdiff-hydra vdiff-magit evil-cleverparens paredit magit-lfs col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine company-lsp base16-theme)))
  '(recentf-max-saved-items 100)
  '(safe-local-variable-values
    (quote

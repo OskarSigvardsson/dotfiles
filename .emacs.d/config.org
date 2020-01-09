@@ -15,6 +15,16 @@ folder, at the top.
   (gk/add-dir-to-path (concat (getenv "HOME") "/bin"))
 #+END_SRC
 
+** Evil/org-mode setting
+This setting is necessary to make evil/org work together in a terminal
+successfully. It needs to be set before any part of evil-mode is
+loaded, so do it pretty early here. 
+
+#+BEGIN_SRC emacs-lisp
+  (unless (display-graphic-p)
+    (setq evil-want-C-i-jump nil))
+#+END_SRC
+
 ** WSL handling
 Set a a special variable to indicate that we're on WSL. It is detected
 by checking if the folder "/mnt/c" exists. Also creates c:/emacs
@@ -56,12 +66,14 @@ the terminal use `emacs-edit`
 #+END_SRC
 
 ** Custom file
+
 Don't want the custom file polluting the main config file
 
 #+BEGIN_SRC emacs-lisp
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file)
 #+END_SRC   
+
 ** Disable clipboard integration with registers
 Emacs clobbers the clipboard a little too readily, so I'm going to try
 turning the automatic integration off. Still enable it with regular Cmd-C/X/V
@@ -112,7 +124,6 @@ backups. This probably helps. Got it from emacswiki or something.
 #+END_SRC
 
 ** Basic emacs keys
-
 Right Cmd is meta, option is just option. Remapping escape to be more
 impactful.
 
@@ -153,36 +164,37 @@ F11/F12 to start/stop the profiler
 I should make this into a minor mode...
 
 #+BEGIN_SRC emacs-lisp
-  (defun gk/swap-keys (k1 k2)
-    "Swap two keys on a low level"
-    (keyboard-translate k1 k2)
-    (keyboard-translate k2 k1))
+    (defun gk/swap-keys (k1 k2)
+      "Swap two keys on a low level"
+      (keyboard-translate k1 k2)
+      (keyboard-translate k2 k1))
 
-  (defun gk/enable-swedish-keyswap ()
-    (interactive) 
-    (gk/swap-keys ?ö ?{)
-    (gk/swap-keys ?ä ?})
-    (gk/swap-keys ?Ö ?[)
-    (gk/swap-keys ?Ä ?])
-    (gk/swap-keys ?å ?^)
-    (gk/swap-keys ?Å ?$))
+    (defun gk/enable-swedish-keyswap ()
+      (interactive) 
+      (gk/swap-keys ?ö ?{)
+      (gk/swap-keys ?ä ?})
+      (gk/swap-keys ?Ö ?[)
+      (gk/swap-keys ?Ä ?])
+      (gk/swap-keys ?å ?^)
+      (gk/swap-keys ?Å ?$))
 
-  (defun gk/disable-swedish-keyswap ()
-(interactive) 
-(keyboard-translate ?ö ?ö)
-    (keyboard-translate ?ä ?ä)
-    (keyboard-translate ?Ö ?Ö)
-    (keyboard-translate ?Ä ?Ä)
-    (keyboard-translate ?å ?å)
-    (keyboard-translate ?Å ?Å)
-    (keyboard-translate ?{ ?{)
-    (keyboard-translate ?} ?})
-    (keyboard-translate ?[ ?[)
-    (keyboard-translate ?] ?])
-    (keyboard-translate ?^ ?^)
-    (keyboard-translate ?$ ?$))
+    (defun gk/disable-swedish-keyswap ()
+  (interactive) 
+  (keyboard-translate ?ö ?ö)
+      (keyboard-translate ?ä ?ä)
+      (keyboard-translate ?Ö ?Ö)
+      (keyboard-translate ?Ä ?Ä)
+      (keyboard-translate ?å ?å)
+      (keyboard-translate ?Å ?Å)
+      (keyboard-translate ?{ ?{)
+      (keyboard-translate ?} ?})
+      (keyboard-translate ?[ ?[)
+      (keyboard-translate ?] ?])
+      (keyboard-translate ?^ ?^)
+      (keyboard-translate ?$ ?$))
 
-  (gk/enable-swedish-keyswap)
+  (when (display-graphic-p)
+    (gk/enable-swedish-keyswap))
 #+END_SRC
 
 *** TODO make this into a global minor "keyswap" mode
@@ -200,6 +212,7 @@ Definitely do wrap the compilation buffer though
   (add-hook 'compilation-mode-hook (lambda () (setq truncate-lines nil)))
 
 #+END_SRC
+
 ** Scroll options
 Scrolling how I like it. scroll-conservatively makes it so that
 scolling across the screen doesn't recenter the line.
@@ -209,12 +222,14 @@ scolling across the screen doesn't recenter the line.
   (setq scroll-margin 5)
 
 #+END_SRC
+
 ** Sentences end in single space.
 The default value is insanity.
 
 #+BEGIN_SRC emacs-lisp
   (setq sentence-end-double-space nil)
 #+END_SRC
+
 ** Fix whitespace before saving
 #+BEGIN_SRC emacs-lisp
   ; (add-hook
@@ -254,6 +269,7 @@ whatever.
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode t)
 #+END_SRC
+
 ** Tab settings
 Tabs are 4 characters, c offset is 4, and replace tabs with spaces by
 default.
@@ -264,20 +280,24 @@ default.
    c-basic-offset   4)
    ;indent-tabs-mode nil)
 #+END_SRC
+
 ** Compile/recompile with F5
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "S-<f5>") 'compile)
   (global-set-key (kbd "<f5>") 'recompile)
 #+END_SRC
+
 ** Use ido-mode
 #+BEGIN_SRC emacs-lisp
   (ido-mode t)
 #+END_SRC
+
 ** Enable recentf
 #+BEGIN_SRC emacs-lisp
   (recentf-mode)
 #+END_SRC
+
 ** Adjust garbage collection settings
 When profiling, "Automatic GC" shows up every time with like 20% of
 the time. The original GC threshold is like 800kb, which is not very
@@ -711,7 +731,8 @@ For the modeline
             (accent telephone-line-vc-segment telephone-line-erc-modified-channels-segment telephone-line-process-segment)
             (nil telephone-line-buffer-segment)))
 
-    (telephone-line-mode 1))
+    (when (display-graphic-p)
+      (telephone-line-mode 1)))
 #+END_SRC
 
 ** Vdiff
@@ -1268,3 +1289,4 @@ a way to fix that...
 
   (default-window-setup)
 #+END_SRC
+
