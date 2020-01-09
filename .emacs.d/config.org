@@ -160,6 +160,12 @@ F11/F12 to start/stop the profiler
   (global-set-key (kbd "<f12>") (lambda () (interactive) (profiler-report) (profiler-stop)))
 #+END_SRC
 
+** Use mouse in terminal
+#+BEGIN_SRC emacs-lisp
+  (unless (display-graphic-p)
+    (xterm-mouse-mode 1))
+#+END_SRC
+
 ** Swap swedish keys for control characters
 I should make this into a minor mode...
 
