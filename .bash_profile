@@ -60,6 +60,3 @@ then
         fortune -s
     fi
 fi
-
-
-source /Users/oskar.sigvardsson/Library/Preferences/org.dystroy.broot/launcher/bash/br
