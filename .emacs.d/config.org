@@ -482,23 +482,23 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
     :ensure t
     :config
     (load-theme 'gruvbox t)
+    ;; In order to make gruvbox more usable, I've manually edited the
+    ;; theme file to remove org-block-begin-line and org-block-end-line
 
-    ; In order to make gruvbox more usable, I've manually edited the
-    ; theme file to remove org-block-begin-line and org-block-end-line
-
-    ; I don't quite understand why, but if this runs synchronously it
-    ; can't find the faces
-    (run-at-time 1 nil
-      (lambda()
-        (let ((diff-red    "#650004")
-              (diff-green  "#555100")
-              (diff-yellow "#5c3c00"))
-          (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
-          (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
-          (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
-          (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
-          (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
-          (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)))))
+    ;; I don't quite understand why, but if this runs synchronously it
+    ;; can't find the faces
+    (run-at-time
+     1 nil
+     (lambda()
+       (let ((diff-red    "#650004")
+             (diff-green  "#555100")
+             (diff-yellow "#5c3c00"))
+         (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
+         (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
+         (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
+         (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
+         (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
+         (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)))))
 #+END_SRC   
 
 ** Faces
@@ -532,6 +532,7 @@ hard-set these headlines to be regular weight and slant.
   (set-face-attribute 'outline-7 nil :weight 'normal :slant 'normal)
   (set-face-attribute 'outline-8 nil :weight 'normal :slant 'normal)
 #+END_SRC
+
 ** GUI
 No toolbar or scrollbar. Maybe no fringe?
 
@@ -564,6 +565,11 @@ Start maximized
 
 #+BEGIN_SRC emacs-lisp
   (toggle-frame-maximized)
+#+END_SRC
+
+No menu bar
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
 #+END_SRC
 
 ** Matching parens
@@ -1308,4 +1314,3 @@ a way to fix that...
 
   (default-window-setup)
 #+END_SRC
-

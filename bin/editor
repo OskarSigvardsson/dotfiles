@@ -1,7 +1,8 @@
 #!/bin/bash
 
-emacsclient "$@"
+emacs -nw "$@"
+# emacsclient "$@"
 
-if [[ $? != 0 ]]; then
-	vim "$@"
-fi
+# if [[ $? != 0 ]]; then
+# 	vim "$@"
+# fi
