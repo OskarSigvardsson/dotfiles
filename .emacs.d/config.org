@@ -62,7 +62,8 @@ Start the server so that you can use emacsclient. To edit a file from
 the terminal use `emacs-edit`
 
 #+BEGIN_SRC emacs-lisp
-  (server-mode 1)
+  (when window-system
+    (server-mode 1))
 #+END_SRC
 
 ** Custom file
@@ -472,6 +473,7 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
     (interactive "SHook: \naFunction: ")
     (add-hook hook func nil t))
 #+END_SRC
+
 * Look options
 ** Theme
 *** Gruvbox
@@ -628,8 +630,6 @@ Company for autocompletion
     :ensure t
     :config
     (setq magit-no-confirm '(stage-all-changes unstage-all-changes))
-    (use-package evil-magit
-      :ensure t)
     (add-to-list 'magit-section-initial-visibility-alist '(stashes . hide)))
 #+END_SRC
 
@@ -918,14 +918,14 @@ been mapped to escape, it's no longer really needed as much.
 
 ** Stamp command
 #+BEGIN_SRC emacs-lisp
+  (add-hook 'evil-mode-hook (lambda ()
   (evil-define-command evil-stamp ()
-    "Replace word with latest yank"
-    (interactive)
-    (evil-with-single-undo
-      (save-excursion
-          (kill-word 1)
-          (evil-paste-from-register ?0))))
-
+	"Replace word with latest yank"
+	(interactive)
+	(evil-with-single-undo
+	  (save-excursion
+		  (kill-word 1)
+		  (evil-paste-from-register ?0))))))
 #+END_SRC
 ** Paste line and bump first number
 
@@ -941,6 +941,7 @@ been mapped to escape, it's no longer really needed as much.
           (cond ((re-search-forward "-?[0-9]+" (point-at-eol) t)
                  (replace-match (number-to-string (funcall increment-match)))))))))
 
+(add-hook 'evil-mode-hook (lambda ()
   (evil-define-command evil-paste-increment-and-yank (repeat)
     "Paste, increment the first number in line, then yank again"
     (interactive "p")
@@ -950,6 +951,7 @@ been mapped to escape, it's no longer really needed as much.
         (next-line)
         (increment-first-number-in-line (+ i 1)))
       (call-interactively 'evil-yank-line)))
+))
 #+END_SRC
 
 *** TODO bump all numbers in line
@@ -980,7 +982,9 @@ vii, cii, etc)
     :ensure t
     :config
 
-    (evil-mode t))
+	(use-package evil-magit :ensure t)
+    
+(evil-mode t))
 #+END_SRC
 * Org mode
 Org mode folders
@@ -1150,6 +1154,8 @@ C/C++ language server
   ;;     :config
   ;;     (add-to-list 'company-backends 'company-lsp))
 
+  ;;   (use-package flycheck
+  ;;     :ensure t)
   ;;   ;; (use-package flycheck
   ;;   ;;   :ensure t
   ;;   ;;   :config
@@ -1286,14 +1292,19 @@ a way to fix that...
 
   (defun default-window-setup ()
     (interactive)
-    (delete-other-windows)
-    (split-window-right)
-    (switch-to-buffer "*scratch*")
-    (other-window 1 nil)
-    ; something else than scratch on left?
-    (switch-to-buffer "*scratch*")
-    ; (find-file org-default-notes-file)
-    (other-window 1 nil))
+    (if (display-graphic-p)
+        (progn
+          (delete-other-windows)
+          (split-window-right)
+          (switch-to-buffer "*scratch*")
+          (other-window 1 nil)
+                                          ; something else than scratch on left?
+          (switch-to-buffer "*scratch*")
+                                          ; (find-file org-default-notes-file)
+          (other-window 1 nil))
+      (progn
+        (delete-other-windows)
+        (switch-to-buffer "*scratch*"))))
 
   (default-window-setup)
 #+END_SRC
