@@ -176,32 +176,67 @@ I should make this into a minor mode...
       (keyboard-translate k1 k2)
       (keyboard-translate k2 k1))
 
-    (defun gk/enable-swedish-keyswap ()
-      (interactive) 
-      (gk/swap-keys ?ö ?{)
-      (gk/swap-keys ?ä ?})
-      (gk/swap-keys ?Ö ?[)
-      (gk/swap-keys ?Ä ?])
-      (gk/swap-keys ?å ?^)
-      (gk/swap-keys ?Å ?$))
+   (define-minor-mode swedish-keyswap-mode
+     "A minor mode that swaps swedish keys for more useful programming keys"
+     :global t
+     (cond (swedish-keyswap-mode
+         (progn
+           (gk/swap-keys ?ö ?\{)
+           (gk/swap-keys ?ä ?\})
+           (gk/swap-keys ?Ö ?\[)
+           (gk/swap-keys ?Ä ?\])
+           (gk/swap-keys ?å ?^)
+           (gk/swap-keys ?Å ?$)))
+        (t
+       (progn
+         (keyboard-translate ?ö ?ö)
+         (keyboard-translate ?ä ?ä)
+         (keyboard-translate ?Ö ?Ö)
+         (keyboard-translate ?Ä ?Ä)
+         (keyboard-translate ?å ?å)
+         (keyboard-translate ?Å ?Å)
+         (keyboard-translate ?\{ ?\{)
+         (keyboard-translate ?\} ?\})
+         (keyboard-translate ?\[ ?\[)
+         (keyboard-translate ?\] ?\])
+         (keyboard-translate ?^ ?^)
+         (keyboard-translate ?$ ?$)))))
 
-    (defun gk/disable-swedish-keyswap ()
-  (interactive) 
-  (keyboard-translate ?ö ?ö)
-      (keyboard-translate ?ä ?ä)
-      (keyboard-translate ?Ö ?Ö)
-      (keyboard-translate ?Ä ?Ä)
-      (keyboard-translate ?å ?å)
-      (keyboard-translate ?Å ?Å)
-      (keyboard-translate ?{ ?{)
-      (keyboard-translate ?} ?})
-      (keyboard-translate ?[ ?[)
-      (keyboard-translate ?] ?])
-      (keyboard-translate ?^ ?^)
-      (keyboard-translate ?$ ?$))
+    (when (display-graphic-p)
+      (swedish-keyswap-mode 1))
 
-  (when (display-graphic-p)
-    (gk/enable-swedish-keyswap))
+    ;; (defun gk/enable-swedish-keyswap ()
+    ;;   (interactive) 
+    ;;   (gk/swap-keys ?ö ?{)
+    ;;   (gk/swap-keys ?ä ?})
+    ;;   (gk/swap-keys ?Ö ?[)
+    ;;   (gk/swap-keys ?Ä ?])
+    ;;   (gk/swap-keys ?å ?^)
+    ;;   (gk/swap-keys ?Å ?$))
+
+    ;; (defun gk/disable-swedish-keyswap ()
+    ;;   (interactive) 
+    ;;   (keyboard-translate ?ö ?ö)
+    ;;   (keyboard-translate ?ä ?ä)
+    ;;   (keyboard-translate ?Ö ?Ö)
+    ;;   (keyboard-translate ?Ä ?Ä)
+    ;;   (keyboard-translate ?å ?å)
+    ;;   (keyboard-translate ?Å ?Å)
+    ;;   (keyboard-translate ?{ ?{)
+    ;;   (keyboard-translate ?} ?})
+    ;;   (keyboard-translate ?[ ?[)
+    ;;   (keyboard-translate ?] ?])
+    ;;   (keyboard-translate ?^ ?^)
+    ;;   (keyboard-translate ?$ ?$))
+
+    ;; (defun gk/toggle-swedish-keyswap ()
+    ;;   (interactive)
+    ;;   (if gk/swedish-keyswap-enabled
+    ;; 	  (gk/disable-swedish-keyswap)
+    ;; 	(gk/enable-swedish-keyswap)))
+
+    ;; (when (display-graphic-p)
+    ;;   (gk/enable-swedish-keyswap))
 #+END_SRC
 
 *** TODO make this into a global minor "keyswap" mode
@@ -295,9 +330,9 @@ default.
   (global-set-key (kbd "<f5>") 'recompile)
 #+END_SRC
 
-** Use ido-mode
+** Use ivy-mode
 #+BEGIN_SRC emacs-lisp
-  (ido-mode t)
+  ;; (ivy-mode t)
 #+END_SRC
 
 ** Enable recentf
@@ -324,6 +359,13 @@ well as preventing GC from running while typing.
 #+BEGIN_SRC emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 1024))
   (run-with-idle-timer 15 t #'garbage-collect)
+#+END_SRC
+
+** quit-window kills buffers
+#+BEGIN_SRC emacs-lisp
+;;   (advice-add 'quit-window
+;;               :around (lambda (orig-fun &rest r)
+;;                         (apply orig-fun '(t))))
 #+END_SRC
 
 * Custom functions
@@ -478,27 +520,26 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
 ** Theme
 *** Gruvbox
 #+BEGIN_SRC emacs-lisp
-  (use-package gruvbox-theme
-    :ensure t
-    :config
-    (load-theme 'gruvbox t)
-    ;; In order to make gruvbox more usable, I've manually edited the
-    ;; theme file to remove org-block-begin-line and org-block-end-line
+    (use-package gruvbox-theme
+      :ensure t
+      :config
+      (load-theme 'gruvbox t)
 
-    ;; I don't quite understand why, but if this runs synchronously it
-    ;; can't find the faces
-    (run-at-time
-     1 nil
-     (lambda()
-       (let ((diff-red    "#650004")
-             (diff-green  "#555100")
-             (diff-yellow "#5c3c00"))
-         (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
-         (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
-         (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
-         (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
-         (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
-         (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)))))
+      ;; I don't quite understand why, but if this runs synchronously it
+      ;; can't find the faces
+      (run-at-time
+       1 nil
+       (lambda()
+         (let ((diff-red    "#650004")
+               (diff-green  "#555100")
+               (diff-yellow "#5c3c00"))
+           (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
+           (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
+           (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
+           (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
+           (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
+           (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)
+           (set-face-attribute 'highlight nil :foreground nil :background "#504945")))))
 #+END_SRC   
 
 ** Faces
@@ -506,6 +547,7 @@ The most important setting of all!
 
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'default nil :height 200 :foundry "Matt" :family "Triplicate T4c")
+  ;; (set-face-attribute 'default nil :height 220 :weight 'thin :foundry "Matt" :family "Operator Mono")
 #+END_SRC
 
 
@@ -539,7 +581,10 @@ No toolbar or scrollbar. Maybe no fringe?
 #+BEGIN_SRC emacs-lisp
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  ;(set-face-attribute 'fringe nil :background nil)
+  ;;(set-face-attribute 'fringe nil :background nil)
+
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)) 
 #+END_SRC
 
 Enable relative line numbers
@@ -569,7 +614,8 @@ Start maximized
 
 No menu bar
 #+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
+  (unless (display-graphic-p)
+    (menu-bar-mode -1))
 #+END_SRC
 
 ** Matching parens
@@ -599,14 +645,12 @@ Company for autocompletion
 
     ; (add-to-list 'company-backends 'company-files)
 
-    ;; Limit backends, tabnine will do most of the work
-    (setq company-backends '(company-capf company-files))
+    ; (setq company-backends '(company-capf company-files))
 
 
     (add-hook 'text-mode-hook (lambda () (company-mode -1)))
 
-    ;; Trigger completion immediately.
-    (setq-default company-idle-delay 0.1)
+    (setq-default company-idle-delay 2)
 
     ;; Number the candidates (use M-1, M-2 etc to select completions).
     (setq company-show-numbers t)
@@ -642,9 +686,9 @@ Company for autocompletion
 ** which-key
 
 #+BEGIN_SRC emacs-lisp
-    (use-package which-key
-      :ensure t
-      :config (which-key-mode 1))
+  (use-package which-key
+     :ensure t
+     :config (which-key-mode 1))
 #+END_SRC
 
 ** ledger
@@ -697,10 +741,11 @@ Expands region by semantic units
 Lets try this thing out!
 
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package company-tabnine
-  ;;   :ensure t
-  ;;   :config
-  ;;   (add-to-list 'company-backends #'company-tabnine t))
+  (when (display-graphic-p)
+    (use-package company-tabnine
+      :ensure t
+      :config
+      (add-to-list 'company-backends #'company-tabnine t)))
 #+END_SRC
 
 To install binary, run `M-x company-tabnine-install-binary`
@@ -779,6 +824,15 @@ For the modeline
       ("j" gk/increase-default-font-size)
       ("k" gk/decrease-default-font-size)))
 #+END_SRC
+
+** flycheck
+#+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+      :ensure t
+      :config
+      (add-hook 'prog-mode-hook #'flycheck-mode))
+#+END_SRC
+
 * Helm
 #+BEGIN_SRC emacs-lisp
   (use-package helm
@@ -848,57 +902,53 @@ For the modeline
 ** Keymaps
 #+BEGIN_SRC emacs-lisp
   (defun evil-set-keys ()
-	(general-define-key
-	 :states 'normal
-	 ",s"                'mark-whole-buffer
-	 ",f"                'helm-find-files
-	 ",p"                'helm-ls-git-ls
-	 ",b"                'helm-mini
-	 ",m"                'magit-status
-	 ",g"                'helm-rg-git-root  ; defined in helm section
-	 ",k"                'kill-this-buffer
-	 ",h"                'helm-apropos
-	 ",c"                'gk/kill-number-into-calc
-	 "√"                 'gk/move-line-down
-	 "ª"                 'gk/move-line-up
-	 "M-p"               'evil-paste-increment-and-yank
-	 "S"                 'evil-stamp
-	 "+"                 'flymake-goto-next-error
-	 "-"                 'flymake-goto-previous-error
-	 "<deletechar>"      'clear-line
-	 "<left>"            'evil-window-left
-	 "<right>"           'evil-window-right
-	 "<up>"              'evil-window-up
-	 "<down>"            'evil-window-down
-	 "<backspace>"       'evil-ex-nohighlight
-	 "RET"               'gk/insert-empty-line
-	 "z"                 'save-buffer
-	 "SPC"               'helm-M-x)
+    (general-define-key
+     :states 'normal
+     ",s"                'mark-whole-buffer
+     ",f"                'helm-find-files
+     ",p"                'helm-ls-git-ls
+     ",b"                'helm-mini
+     ",m"                'magit-status
+     ",g"                'helm-rg-git-root  ; defined in helm section
+     ",k"                'kill-this-buffer
+     ",h"                'helm-apropos
+     ",c"                'gk/kill-number-into-calc
+     "√"                 'gk/move-line-down
+     "ª"                 'gk/move-line-up
+     "M-p"               'evil-paste-increment-and-yank
+     "S"                 'evil-stamp
+     "+"                 'flycheck-next-error
+     "-"                 'flycheck-previous-error
+     "<deletechar>"      'clear-line
+     "<left>"            'evil-window-left
+     "<right>"           'evil-window-right
+     "<up>"              'evil-window-up
+     "<down>"            'evil-window-down
+     "<backspace>"       'evil-ex-nohighlight
+     "RET"               'gk/insert-empty-line
+     "z"                 'save-buffer
+     "SPC"               'helm-M-x)
 
-	(general-define-key
-	 :states 'visual
-	 "gc"   'comment-region
-	 "gC"   'uncomment-region))
+    (general-define-key
+     :states 'visual
+     "gc"   'comment-region
+     "gC"   'uncomment-region)
 
-  ;;   (general-define-key
-  ;;       :states 'insert
-  ;;       "<tab>"   'tab-to-tab-stop
-  ;;       "ö"       (lambda () (interactive) (insert "{") (indent-according-to-mode))
-  ;;       "ä"       (lambda () (interactive) (insert "}") (indent-according-to-mode))
-  ;;       "Ö"       (lambda () (interactive) (insert "["))
-  ;;       "Ä"       (lambda () (interactive) (insert "]"))
-  ;;       "{"       (lambda () (interactive) (insert "ö"))
-  ;;       "}"       (lambda () (interactive) (insert "ä"))
-  ;;       "["       (lambda () (interactive) (insert "Ö"))
-  ;;       "]"       (lambda () (interactive) (insert "Ä"))))
+    (general-define-key
+     :keymaps 'org-agenda-mode-map
+     "j" 'evil-next-line
+     "k" 'evil-previous-line))
 
-	(add-hook 'evil-mode-hook 'evil-set-keys)
+
+    (add-hook 'evil-mode-hook 'evil-set-keys)
 #+END_SRC
+
 ** Search module
 Makes gn motion work in cgn/dgn
 #+BEGIN_SRC emacs-lisp
   (setq evil-search-module 'evil-search)
 #+END_SRC
+
 ** Use j/k to get out of insert mode
 This works badly, so i'm disabling it for now. Since caps-lock has
 been mapped to escape, it's no longer really needed as much.
@@ -933,6 +983,7 @@ been mapped to escape, it's no longer really needed as much.
 		  (kill-word 1)
 		  (evil-paste-from-register ?0))))))
 #+END_SRC
+
 ** Paste line and bump first number
 
 #+BEGIN_SRC emacs-lisp
@@ -969,6 +1020,7 @@ been mapped to escape, it's no longer really needed as much.
     (move-beginning-of-line 1)
     (kill-line))
 #+END_SRC
+
 ** Indent text object
 Creates a new text object for indents, with keys ii and ai (i.e. dii,
 vii, cii, etc)
@@ -981,8 +1033,8 @@ vii, cii, etc)
                 :config
                 (evil-indent-plus-default-bindings))))
 #+END_SRC
-** Load it
 
+** Load it
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     :ensure t
@@ -992,14 +1044,15 @@ vii, cii, etc)
     
 (evil-mode t))
 #+END_SRC
+
 * Org mode
 Org mode folders
 #+BEGIN_SRC emacs-lisp
-   (setq org-directory           "~/Dropbox/Org"
-         org-archive-location    "~/Dropbox/Org/archive.org::* Archive"
-         org-default-notes-file  "~/Dropbox/Org/notes.org"
-         org-default-agenda-file "~/Dropbox/Org/agenda.org"
-         org-agenda-files        '("~/Dropbox/Org/notes.org" "~/Dropbox/Org/agenda.org")
+   (setq org-directory           "~/Dropbox (Personal)/Org"
+         org-archive-location    "~/Dropbox (Personal)/Org/archive.org::* Archive"
+         org-default-notes-file  "~/Dropbox (Personal)/Org/todo.org"
+         org-default-agenda-file "~/Dropbox (Personal)/Org/todo.org"
+         org-agenda-files        '("~/Dropbox (Personal)/Org/todo.org")
          org-agenda-window-setup 'current-window)
 #+END_SRC
 
@@ -1023,11 +1076,24 @@ Don't ask for confirmation to execute stuff
         org-confirm-elisp-link-function nil   ;; for elisp links
         org-confirm-shell-link-function nil)  ;; for shell links
 #+END_SRC
+
 ** Agenda
 Show two weeks in agenda
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-span 14)
+  (setq org-agenda-span 14)
+
+  (defun gk/redo-agenda-buffers ()
+    "Redo all agenda buffers"
+    (interactive)
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (derived-mode-p 'org-agenda-mode) 
+          (org-agenda-redo)))))
+
+  ;; (add-hook 'org-mode-hook
+  ;; 		  (lambda () (add-hook 'after-save-hook #'gk/redo-agenda-buffers nil t))
 #+END_SRC
+
 ** Capture
 I should start using this at some point!
 *** Key binding
@@ -1035,10 +1101,12 @@ I should start using this at some point!
   (general-define-key
    "C-c c" 'org-capture)
 #+END_SRC
+
 *** Templates
 #+BEGIN_SRC emacs-lisp
 
 #+END_SRC
+
 ** Evil
 Better evil integration
 
@@ -1089,6 +1157,7 @@ mode.
    "z" 'org-edit-src-exit)
 
 #+END_SRC
+
 ** Fontify source code
 #+BEGIN_SRC emacs-lisp
   (setq org-src-fontify-natively t)
@@ -1106,10 +1175,12 @@ mode.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook 'org-indent-mode)
 #+END_SRC
+
 ** Auto-fill
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook 'auto-fill-mode)
 #+END_SRC
+
 ** Trello
 #+BEGIN_SRC emacs-lisp
   ; (use-package org-trello
@@ -1118,6 +1189,7 @@ mode.
   ;   (setq org-trello-files '("~/Dropbox/Org/Trello/alfie3.org"))
   ;   (add-hook 'org-trello-mode-hook (lambda () (setq truncate-lines nil))))
 #+END_SRC
+
 ** Add pdflatex to path
 #+BEGIN_SRC emacs-lisp
   (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin"))
@@ -1135,11 +1207,13 @@ mode.
   (c-set-offset 'arglist-close '+)
 
 #+END_SRC
+
 ** C#
 #+BEGIN_SRC emacs-lisp
   (use-package csharp-mode
     :ensure t)
 #+END_SRC
+
 ** C
 "Linux" style for the braces, and basic offset of 4
 
@@ -1155,10 +1229,10 @@ C/C++ language server
   ;;   :ensure t
   ;;   :config
 
-  ;;   (use-package company-lsp
-  ;;     :ensure t
-  ;;     :config
-  ;;     (add-to-list 'company-backends 'company-lsp))
+  ;;   ;; (use-package company-lsp
+  ;;   ;;   :ensure t
+  ;;   ;;   :config
+  ;;   ;;   (add-to-list 'company-backends 'company-lsp))
 
   ;;   (use-package flycheck
   ;;     :ensure t)
@@ -1170,7 +1244,8 @@ C/C++ language server
   ;;     ;;   :config
   ;;     ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
 
-  ;;   (add-hook 'c++-mode-hook #'lsp))
+  ;;   (add-hook 'c++-mode-hook #'lsp)
+  ;;   (add-hook 'c-mode-hook #'lsp))
 #+END_SRC
 
 ** Shaderlab
@@ -1253,6 +1328,7 @@ inspect luarocks package
     :config
     (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
 #+END_SRC
+
 * Cotton stuff
 ** Show cotton logs
 #+BEGIN_SRC emacs-lisp
@@ -1302,11 +1378,11 @@ a way to fix that...
         (progn
           (delete-other-windows)
           (split-window-right)
-          (switch-to-buffer "*scratch*")
+          ;;(switch-to-buffer "*scratch*")
+          (find-file org-default-notes-file)
           (other-window 1 nil)
-                                          ; something else than scratch on left?
-          (switch-to-buffer "*scratch*")
-                                          ; (find-file org-default-notes-file)
+          (org-agenda-list)
+          ;;(switch-to-buffer "*scratch*")
           (other-window 1 nil))
       (progn
         (delete-other-windows)
@@ -1314,3 +1390,4 @@ a way to fix that...
 
   (default-window-setup)
 #+END_SRC
+

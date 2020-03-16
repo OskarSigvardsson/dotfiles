@@ -4,7 +4,7 @@
 	email = oskarsigvardsson@gmail.com
 
 [core]
-	excludesfile = $HOME/.gitignore_global
+	excludesfile = /Users/oskar.sigvardsson/.gitignore_global
 	autocrlf = input
 	filemode = false
 
@@ -30,3 +30,5 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[submodule]
+	recurse = true
