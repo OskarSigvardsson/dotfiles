@@ -161,6 +161,15 @@ F11/F12 to start/stop the profiler
   (global-set-key (kbd "<f12>") (lambda () (interactive) (profiler-report) (profiler-stop)))
 #+END_SRC
 
+On macOS, disable s-q (i.e. Cmd+Q) for quitting. It's too close to M-q (which
+formats paragraphs) and I keep hitting it by mistake. I never exit emacs this
+way anyway, it's always either C-x C-c or :q anyway
+
+#+BEGIN_SRC emacs-lisp
+    (when (string-equal system-type "darwin")
+      (global-set-key (kbd "s-q") (lambda () (interactive) (message "Cmd+Q disabled"))))
+#+END_SRC
+
 ** Use mouse in terminal
 #+BEGIN_SRC emacs-lisp
   (unless (display-graphic-p)
@@ -520,26 +529,26 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
 ** Theme
 *** Gruvbox
 #+BEGIN_SRC emacs-lisp
-    (use-package gruvbox-theme
-      :ensure t
-      :config
-      (load-theme 'gruvbox t)
+  (use-package gruvbox-theme
+    :ensure t
+    :config
+    (load-theme 'gruvbox-dark-hard t)
 
-      ;; I don't quite understand why, but if this runs synchronously it
-      ;; can't find the faces
-      (run-at-time
-       1 nil
-       (lambda()
-         (let ((diff-red    "#650004")
-               (diff-green  "#555100")
-               (diff-yellow "#5c3c00"))
-           (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
-           (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
-           (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
-           (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
-           (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
-           (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)
-           (set-face-attribute 'highlight nil :foreground nil :background "#504945")))))
+    ;; I don't quite understand why, but if this runs synchronously it
+    ;; can't find the faces
+    (run-at-time
+     1 nil
+     (lambda()
+       (let ((diff-red    "#650004")
+             (diff-green  "#555100")
+             (diff-yellow "#5c3c00"))
+         (set-face-attribute 'diff-changed nil :background diff-yellow :foreground nil)
+         (set-face-attribute 'diff-added   nil :background diff-green  :foreground nil)
+         (set-face-attribute 'diff-removed nil :background diff-red    :foreground nil)
+         (set-face-attribute 'diff-indicator-changed nil :inherit 'diff-changed)
+         (set-face-attribute 'diff-indicator-added   nil :inherit 'diff-added)
+         (set-face-attribute 'diff-indicator-removed nil :inherit 'diff-removed)
+         (set-face-attribute 'highlight nil :foreground nil :background "#504945")))))
 #+END_SRC   
 
 ** Faces

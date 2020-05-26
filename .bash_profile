@@ -60,3 +60,5 @@ then
         fortune -s
     fi
 fi
+
+export PATH="$HOME/.cargo/bin:$PATH"
