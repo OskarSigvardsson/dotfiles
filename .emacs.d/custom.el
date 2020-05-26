@@ -28,17 +28,13 @@
  '(neo-window-fixed-size nil)
  '(org-deadline-warning-days 3)
  '(org-log-done (quote time))
- '(package-selected-packages
-   (quote
-	(all-the-icons ox-reveal org-reveal web-mode php-mode docker-compose-mode nginx-mode json-mode cmake-mode go-mode brainfuck-mode rust-mode systemd raku-mode org-re-reveal-ref org-re-reveal perl6-mode company-lsp lsp-mode counsel ivy-posframe ivy rtags doom-themes undo-tree evil-visual-mark-mode flycheck lua-mode csharp-mode evil-indent-plus helm vdiff telephone-line magit company gnuplot gnuplot-mode quickrun transpose-frame csv-mode vdiff-hydra vdiff-magit evil-cleverparens paredit magit-lfs col-highlight crosshairs yasnippet-snippets which-key use-package shader-mode rmsbolt projectile org-bullets omnisharp nlinum neotree ledger-mode helm-ls-git hacker-typer general flycheck-ledger expand-region evil-org evil-magit evil-lion cquery company-tabnine base16-theme)))
- '(recentf-max-saved-items 100)
+ '(recentf-max-saved-items 1000)
  '(safe-local-variable-values
    (quote
 	((eval when
 		   (fboundp
 			(quote rainbow-mode))
 		   (rainbow-mode 1)))))
- '(scheme-program-name "chez")
  '(telephone-line-modified-text " ")
  '(undo-tree-enable-undo-in-region nil)
  '(vdiff-disable-folding t))
