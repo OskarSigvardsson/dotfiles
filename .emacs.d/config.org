@@ -30,31 +30,33 @@ Set a a special variable to indicate that we're on WSL. It is detected
 by checking if the folder "/mnt/c" exists. Also creates c:/emacs
 directory for emacs communication
 
+UPDATE: i don't use WSL any more so lets comment out this section
+
 #+BEGIN_SRC emacs-lisp
-  (setq emacs-on-wsl (file-directory-p "/mnt/c"))
-  (setq emacs-wsl-directory "/mnt/c/emacs")
+  ;; (setq emacs-on-wsl (file-directory-p "/mnt/c"))
+  ;; (setq emacs-wsl-directory "/mnt/c/emacs")
 
-  (when emacs-on-wsl (make-directory emacs-wsl-directory t))
+  ;; (when emacs-on-wsl (make-directory emacs-wsl-directory t))
 
-  (defun gk/emacs-wsl-delete-server-file ()
-    "Delete the server file from windows"
-    (delete-file (gk/emacs-wsl-server-file)))
+  ;; (defun gk/emacs-wsl-delete-server-file ()
+  ;;   "Delete the server file from windows"
+  ;;   (delete-file (gk/emacs-wsl-server-file)))
 
-  (defun gk/emacs-wsl-server-file ()
-    "The file containing server details on WSL"
-    (concat (file-name-as-directory emacs-wsl-directory) "server"))
+  ;; (defun gk/emacs-wsl-server-file ()
+  ;;   "The file containing server details on WSL"
+  ;;   (concat (file-name-as-directory emacs-wsl-directory) "server"))
 
-  (defun gk/emacs-wsl-copy-server-file ()
-    "Copy the server file from WSL to windows. Used in server-mode-hook"
-    (let ((source (concat (file-name-as-directory server-auth-dir) "server"))
-          (destination (gk/emacs-wsl-server-file)))
-      (if server-mode (copy-file source destination t) (gk/emacs-wsl-delete-server-file))))
+  ;; (defun gk/emacs-wsl-copy-server-file ()
+  ;;   "Copy the server file from WSL to windows. Used in server-mode-hook"
+  ;;   (let ((source (concat (file-name-as-directory server-auth-dir) "server"))
+  ;;         (destination (gk/emacs-wsl-server-file)))
+  ;;     (if server-mode (copy-file source destination t) (gk/emacs-wsl-delete-server-file))))
 
-  (when emacs-on-wsl
-    (setq server-use-tcp t)
+  ;; (when emacs-on-wsl
+  ;;   (setq server-use-tcp t)
 
-    (add-hook 'server-mode-hook 'gk/emacs-wsl-copy-server-file)
-    (add-hook 'kill-emacs-hook 'gk/emacs-wsl-delete-server-file))
+  ;;   (add-hook 'server-mode-hook 'gk/emacs-wsl-copy-server-file)
+  ;;   (add-hook 'kill-emacs-hook 'gk/emacs-wsl-delete-server-file))
 #+END_SRC
 
 ** Start server
@@ -171,6 +173,7 @@ way anyway, it's always either C-x C-c or :q anyway
 #+END_SRC
 
 ** Use mouse in terminal
+
 #+BEGIN_SRC emacs-lisp
   (unless (display-graphic-p)
     (xterm-mouse-mode 1))
@@ -214,64 +217,14 @@ I should make this into a minor mode...
     (when (display-graphic-p)
       (swedish-keyswap-mode 1))
 
-    ;; (defun gk/enable-swedish-keyswap ()
-    ;;   (interactive) 
-    ;;   (gk/swap-keys ?ö ?{)
-    ;;   (gk/swap-keys ?ä ?})
-    ;;   (gk/swap-keys ?Ö ?[)
-    ;;   (gk/swap-keys ?Ä ?])
-    ;;   (gk/swap-keys ?å ?^)
-    ;;   (gk/swap-keys ?Å ?$))
-
-    ;; (defun gk/disable-swedish-keyswap ()
-    ;;   (interactive) 
-    ;;   (keyboard-translate ?ö ?ö)
-    ;;   (keyboard-translate ?ä ?ä)
-    ;;   (keyboard-translate ?Ö ?Ö)
-    ;;   (keyboard-translate ?Ä ?Ä)
-    ;;   (keyboard-translate ?å ?å)
-    ;;   (keyboard-translate ?Å ?Å)
-    ;;   (keyboard-translate ?{ ?{)
-    ;;   (keyboard-translate ?} ?})
-    ;;   (keyboard-translate ?[ ?[)
-    ;;   (keyboard-translate ?] ?])
-    ;;   (keyboard-translate ?^ ?^)
-    ;;   (keyboard-translate ?$ ?$))
-
-    ;; (defun gk/toggle-swedish-keyswap ()
-    ;;   (interactive)
-    ;;   (if gk/swedish-keyswap-enabled
-    ;; 	  (gk/disable-swedish-keyswap)
-    ;; 	(gk/enable-swedish-keyswap)))
-
-    ;; (when (display-graphic-p)
-    ;;   (gk/enable-swedish-keyswap))
-#+END_SRC
-
-*** TODO make this into a global minor "keyswap" mode
-** Truncate lines
-No wrapping, basically. I'm not sure I like this for every buffer,
-maybe just code?
-
-#+BEGIN_SRC emacs-lisp
-(set-default 'truncate-lines t)
-#+END_SRC
-
-Definitely do wrap the compilation buffer though
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'compilation-mode-hook (lambda () (setq truncate-lines nil)))
-
 #+END_SRC
 
 ** Scroll options
 Scrolling how I like it. scroll-conservatively makes it so that
 scolling across the screen doesn't recenter the line.
 #+BEGIN_SRC emacs-lisp
-
   (setq scroll-conservatively 101)
   (setq scroll-margin 5)
-
 #+END_SRC
 
 ** Sentences end in single space.
@@ -328,8 +281,8 @@ default.
 #+BEGIN_SRC emacs-lisp
   (setq-default
    tab-width        4
-   c-basic-offset   4)
-   ;indent-tabs-mode nil)
+   c-basic-offset   4
+   indent-tabs-mode nil)
 #+END_SRC
 
 ** Compile/recompile with F5
@@ -337,11 +290,6 @@ default.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "S-<f5>") 'compile)
   (global-set-key (kbd "<f5>") 'recompile)
-#+END_SRC
-
-** Use ivy-mode
-#+BEGIN_SRC emacs-lisp
-  ;; (ivy-mode t)
 #+END_SRC
 
 ** Enable recentf
@@ -368,13 +316,6 @@ well as preventing GC from running while typing.
 #+BEGIN_SRC emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 1024))
   (run-with-idle-timer 15 t #'garbage-collect)
-#+END_SRC
-
-** quit-window kills buffers
-#+BEGIN_SRC emacs-lisp
-;;   (advice-add 'quit-window
-;;               :around (lambda (orig-fun &rest r)
-;;                         (apply orig-fun '(t))))
 #+END_SRC
 
 * Custom functions
@@ -485,7 +426,7 @@ implementation of this, it changes the font size buffer-locally.
 #+END_SRC
 
 ** Rename and move open buffer file
-From [[https://stackoverflow.com/a/384346/220961][stack overflow]]: 
+From [[https://stackoverflow.com/a/384346/220961][stack overflow]]. This is a little bit hinky, but it more or less works.  
 
 #+BEGIN_SRC emacs-lisp
   (defun gk/rename-file-and-buffer (new-name)
@@ -525,6 +466,20 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]:
     (add-hook hook func nil t))
 #+END_SRC
 
+** Stamp function
+#+BEGIN_SRC emacs-lisp
+  (defun gk/stamp-word ()
+    "Replace current word with whatever's in the kill ring"
+    (interactive)
+    (save-excursion
+      (let ((bounds (if (use-region-p)
+                        (cons (region-beginning) (region-end))
+                      (bounds-of-thing-at-point 'word))))
+        (delete-region (car bounds) (cdr bounds))
+        (yank))))
+#+END_SRC
+
+one two one
 * Look options
 ** Theme
 *** Gruvbox
@@ -634,6 +589,21 @@ Highlight matching parens
   (show-paren-mode 1)
 #+END_SRC
 
+** Truncate lines
+No wrapping, basically. I'm not sure I like this for every buffer,
+maybe just code?
+
+#+BEGIN_SRC emacs-lisp
+  (set-default 'truncate-lines t)
+#+END_SRC
+
+Definitely do wrap the compilation buffer though
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'compilation-mode-hook (lambda () (setq truncate-lines nil)))
+
+#+END_SRC
+
 * Packages
 ** General key binding
 Not sure i need this, really. Maybe I should try redoing my keymaps in
@@ -646,6 +616,7 @@ an "emacs native" way.
 
 ** Company
 Company for autocompletion
+
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :straight t
@@ -659,7 +630,7 @@ Company for autocompletion
 
     (add-hook 'text-mode-hook (lambda () (company-mode -1)))
 
-    (setq-default company-idle-delay 2)
+    (setq-default company-idle-delay 0.5)
 
     ;; Number the candidates (use M-1, M-2 etc to select completions).
     (setq company-show-numbers t)
@@ -671,6 +642,10 @@ Company for autocompletion
           '(;; company-tng-frontend
             company-pseudo-tooltip-frontend
             company-echo-metadata-frontend)))
+
+  (use-package company-box
+    :straight t
+    :hook (company-mode . company-box-mode))
 #+END_SRC
 
 ** Projectile
@@ -750,11 +725,11 @@ Expands region by semantic units
 Lets try this thing out!
 
 #+BEGIN_SRC emacs-lisp
-  (when (display-graphic-p)
-    (use-package company-tabnine
-      :straight t
-      :config
-      (add-to-list 'company-backends #'company-tabnine t)))
+  ;; (when (display-graphic-p)
+  ;;   (use-package company-tabnine
+  ;;     :straight t
+  ;;     :config
+  ;;     (add-to-list 'company-backends #'company-tabnine)))
 #+END_SRC
 
 To install binary, run `M-x company-tabnine-install-binary`
@@ -925,7 +900,7 @@ For the modeline
      "√"                 'gk/move-line-down
      "ª"                 'gk/move-line-up
      "M-p"               'evil-paste-increment-and-yank
-     "S"                 'evil-stamp
+     "S"                 'gk/stamp-word
      "+"                 'flycheck-next-error
      "-"                 'flycheck-previous-error
      "<deletechar>"      'clear-line
@@ -979,18 +954,6 @@ been mapped to escape, it's no longer really needed as much.
        :straight t
        :config
        (evil-lion-mode t))))
-#+END_SRC
-
-** Stamp command
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'evil-mode-hook (lambda ()
-  (evil-define-command evil-stamp ()
-	"Replace word with latest yank"
-	(interactive)
-	(evil-with-single-undo
-	  (save-excursion
-		  (kill-word 1)
-		  (evil-paste-from-register ?0))))))
 #+END_SRC
 
 ** Paste line and bump first number
@@ -1055,6 +1018,10 @@ vii, cii, etc)
 #+END_SRC
 
 * Org mode
+#+BEGIN_SRC emacs-lisp
+;;(straight-use-package 'org)
+#+END_SRC
+
 Org mode folders
 #+BEGIN_SRC emacs-lisp
    (setq org-directory           "~/Dropbox (Personal)/Org"
@@ -1205,6 +1172,9 @@ mode.
 #+END_SRC
 
 ** Reveal
+#+BEGIN_SRC emacs-lisp
+;;  (use-package ox-reveal :straight t)	
+#+END_SRC
 
 * Languages
 ** Indentation
@@ -1234,27 +1204,27 @@ mode.
 ** C++
 C/C++ language server
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package lsp-mode
-  ;;   :straight t
-  ;;   :config
+ (use-package lsp-mode
+   :straight t
+   :config
 
-  ;;   ;; (use-package company-lsp
-  ;;   ;;   :straight t
-  ;;   ;;   :config
-  ;;   ;;   (add-to-list 'company-backends 'company-lsp))
+   ;; (use-package company-lsp
+   ;;   :straight t
+   ;;   :config
+   ;;   (add-to-list 'company-backends 'company-lsp))
 
-  ;;   (use-package flycheck
-  ;;     :straight t)
-  ;;   ;; (use-package flycheck
-  ;;   ;;   :straight t
-  ;;   ;;   :config
-  ;;     ;; (use-package lsp-ui
-  ;;     ;;   :straight t
-  ;;     ;;   :config
-  ;;     ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
+   (use-package flycheck
+     :straight t)
+   ;; (use-package flycheck
+   ;;   :straight t
+   ;;   :config
+     ;; (use-package lsp-ui
+     ;;   :straight t
+     ;;   :config
+     ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
 
-  ;;   (add-hook 'c++-mode-hook #'lsp)
-  ;;   (add-hook 'c-mode-hook #'lsp))
+   (add-hook 'c++-mode-hook #'lsp)
+   (add-hook 'c-mode-hook #'lsp))
 #+END_SRC
 
 ** Shaderlab
@@ -1378,24 +1348,24 @@ a way to fix that...
 ** Split window into default buffers
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-splash-screen t
-        inhibit-startup-message t
-        inhibit-startup-echo-area-message t)
+	inhibit-startup-message t
+	inhibit-startup-echo-area-message t)
 
   (defun default-window-setup ()
     (interactive)
     (if (display-graphic-p)
-        (progn
-          (delete-other-windows)
-          (split-window-right)
-          ;;(switch-to-buffer "*scratch*")
-          (find-file org-default-notes-file)
-          (other-window 1 nil)
-          (org-agenda-list)
-          ;;(switch-to-buffer "*scratch*")
-          (other-window 1 nil))
+	(progn
+	  (delete-other-windows)
+	  (split-window-right)
+	  ;;(switch-to-buffer "*scratch*")
+	  (find-file org-default-notes-file)
+	  (other-window 1 nil)
+  ;;        (org-agenda-list)
+	  (switch-to-buffer "*scratch*")
+	  (other-window 1 nil))
       (progn
-        (delete-other-windows)
-        (switch-to-buffer "*scratch*"))))
+	(delete-other-windows)
+	(switch-to-buffer "*scratch*"))))
 
   (default-window-setup)
 #+END_SRC
