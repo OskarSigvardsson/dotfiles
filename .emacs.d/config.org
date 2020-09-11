@@ -183,39 +183,39 @@ way anyway, it's always either C-x C-c or :q anyway
 I should make this into a minor mode...
 
 #+BEGIN_SRC emacs-lisp
-    (defun gk/swap-keys (k1 k2)
-      "Swap two keys on a low level"
-      (keyboard-translate k1 k2)
-      (keyboard-translate k2 k1))
+   (defun gk/swap-keys (k1 k2)
+     "Swap two keys on a low level"
+     (keyboard-translate k1 k2)
+     (keyboard-translate k2 k1))
 
-   (define-minor-mode swedish-keyswap-mode
-     "A minor mode that swaps swedish keys for more useful programming keys"
-     :global t
-     (cond (swedish-keyswap-mode
-         (progn
-           (gk/swap-keys ?ö ?\{)
-           (gk/swap-keys ?ä ?\})
-           (gk/swap-keys ?Ö ?\[)
-           (gk/swap-keys ?Ä ?\])
-           (gk/swap-keys ?å ?^)
-           (gk/swap-keys ?Å ?$)))
-        (t
-       (progn
-         (keyboard-translate ?ö ?ö)
-         (keyboard-translate ?ä ?ä)
-         (keyboard-translate ?Ö ?Ö)
-         (keyboard-translate ?Ä ?Ä)
-         (keyboard-translate ?å ?å)
-         (keyboard-translate ?Å ?Å)
-         (keyboard-translate ?\{ ?\{)
-         (keyboard-translate ?\} ?\})
-         (keyboard-translate ?\[ ?\[)
-         (keyboard-translate ?\] ?\])
-         (keyboard-translate ?^ ?^)
-         (keyboard-translate ?$ ?$)))))
+  (define-minor-mode swedish-keyswap-mode
+    "A minor mode that swaps swedish keys for more useful programming keys"
+    :global t
+    (cond (swedish-keyswap-mode
+        (progn
+          (gk/swap-keys ?ö ?\{)
+          (gk/swap-keys ?ä ?\})
+          (gk/swap-keys ?Ö ?\[)
+          (gk/swap-keys ?Ä ?\])
+          (gk/swap-keys ?å ?^)
+          (gk/swap-keys ?Å ?$)))
+       (t
+      (progn
+        (keyboard-translate ?ö ?ö)
+        (keyboard-translate ?ä ?ä)
+        (keyboard-translate ?Ö ?Ö)
+        (keyboard-translate ?Ä ?Ä)
+        (keyboard-translate ?å ?å)
+        (keyboard-translate ?Å ?Å)
+        (keyboard-translate ?\{ ?\{)
+        (keyboard-translate ?\} ?\})
+        (keyboard-translate ?\[ ?\[)
+        (keyboard-translate ?\] ?\])
+        (keyboard-translate ?^ ?^)
+        (keyboard-translate ?$ ?$)))))
 
-    (when (display-graphic-p)
-      (swedish-keyswap-mode 1))
+   ;; (when (display-graphic-p)
+   ;;   (swedish-keyswap-mode 1))
 
 #+END_SRC
 
@@ -554,7 +554,7 @@ No toolbar or scrollbar. Maybe no fringe?
 Enable relative line numbers
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default display-line-numbers 'relative)
+  (setq-default display-line-numbers t)
 #+END_SRC
 
 But no line numbers in magit
@@ -614,6 +614,12 @@ an "emacs native" way.
     :straight t)
 #+END_SRC
 
+** all-the-icons
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons
+    :straight t)
+#+END_SRC
+
 ** Company
 Company for autocompletion
 
@@ -637,15 +643,16 @@ Company for autocompletion
 
     ;; Use the tab-and-go frontend.
     ;; Allows TAB to select and complete at the same time.
-    ;; (company-tng-configure-default)
-    (setq company-frontends
-          '(;; company-tng-frontend
-            company-pseudo-tooltip-frontend
-            company-echo-metadata-frontend)))
+    (company-tng-configure-default)
+  ;;   (setq company-frontends
+  ;;         '(;; company-tng-frontend
+  ;;           company-pseudo-tooltip-frontend
+  ;;           company-echo-metadata-frontend)))
 
-  (use-package company-box
-    :straight t
-    :hook (company-mode . company-box-mode))
+  ;; (use-package company-box
+  ;;   :straight t
+  ;;   :hook (company-mode . company-box-mode))
+    )
 #+END_SRC
 
 ** Projectile
@@ -817,6 +824,19 @@ For the modeline
       (add-hook 'prog-mode-hook #'flycheck-mode))
 #+END_SRC
 
+** yasnippets
+#+BEGIN_SRC emacs-lisp
+   (use-package yasnippet
+     :straight t
+     :config
+     (yas-global-mode 1))
+  ;;   ;(add-to-list 'company-backends 'company-yasnippet))
+
+  (use-package yasnippet-snippets
+    :after yasnippet
+    :straight (yasnippet-snippets :type git :host github
+                                  :repo "oskarsigvardsson/yasnippet-snippets"))
+#+END_SRC
 * Helm
 #+BEGIN_SRC emacs-lisp
   (use-package helm
@@ -1208,10 +1228,10 @@ C/C++ language server
    :straight t
    :config
 
-   ;; (use-package company-lsp
-   ;;   :straight t
-   ;;   :config
-   ;;   (add-to-list 'company-backends 'company-lsp))
+   (use-package company-lsp
+     :straight t
+     :config
+     (add-to-list 'company-backends 'company-lsp))
 
    (use-package flycheck
      :straight t)
@@ -1342,7 +1362,7 @@ Really slow on cotton files, and it doesn't work anyway. I should find
 a way to fix that...
 
 #+BEGIN_SRC emacs-lisp
-  (setq company-backends (delete 'company-clang company-backends))
+  ; (setq company-backends (delete 'company-clang company-backends))
 #+END_SRC
 * Start-up
 ** Split window into default buffers
@@ -1357,8 +1377,8 @@ a way to fix that...
 	(progn
 	  (delete-other-windows)
 	  (split-window-right)
-	  ;;(switch-to-buffer "*scratch*")
-	  (find-file org-default-notes-file)
+	  (switch-to-buffer "*scratch*")
+	  ;;(find-file org-default-notes-file)
 	  (other-window 1 nil)
   ;;        (org-agenda-list)
 	  (switch-to-buffer "*scratch*")

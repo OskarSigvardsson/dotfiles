@@ -3,11 +3,12 @@ if [ -r ~/.bashrc ]; then
 fi
 
 # Aliases
-alias cat="bat"
-alias less="bat"
+alias cat="bat --plain"
+alias less="bat --plain"
 alias ls="exa"
 alias tree="exa --tree"
 alias rg="rg -p"
+alias rd=". ranger"
 
 # Compatible with ranger 1.4.2 through 1.7.*
 #
@@ -20,15 +21,15 @@ alias rg="rg -p"
 # 
 # On OS X 10 or later, replace `usr/bin/ranger` with `/usr/local/bin/ranger`.
 
-function rd {
-    tempfile="$(mktemp -t tmp.XXXXXX)"
-    ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-    test -f "$tempfile" &&
-    if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-        cd -- "$(cat "$tempfile")"
-    fi
-    rm -f -- "$tempfile"
-}
+# function rd {
+#     tempfile="$(mktemp -t tmp.XXXXXX)"
+#     ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+#     test -f "$tempfile" &&
+#     if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
+#         cd -- "$(cat "$tempfile")"
+#     fi
+#     rm -f -- "$tempfile"
+# }
 
 
 function _update_ps1() {

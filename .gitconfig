@@ -27,3 +27,5 @@
 	default = simple
 [submodule]
 	recurse = true
+[pull]
+	rebase = true
