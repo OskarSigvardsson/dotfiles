@@ -64,8 +64,8 @@ Start the server so that you can use emacsclient. To edit a file from
 the terminal use `emacs-edit`
 
 #+BEGIN_SRC emacs-lisp
-  (when window-system
-    (server-mode 1))
+  (load "server")
+  (unless (server-running-p) (server-start))
 #+END_SRC
 
 ** Custom file
@@ -282,7 +282,7 @@ default.
   (setq-default
    tab-width        4
    c-basic-offset   4
-   indent-tabs-mode nil)
+   indent-tabs-mode t)
 #+END_SRC
 
 ** Compile/recompile with F5
@@ -316,6 +316,18 @@ well as preventing GC from running while typing.
 #+BEGIN_SRC emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 1024))
   (run-with-idle-timer 15 t #'garbage-collect)
+#+END_SRC
+
+** Superword mode
+#+BEGIN_SRC emacs-lisp
+  ;; (global-superword-mode 1)
+
+  (add-hook 'prog-mode-hook (lambda() (modify-syntax-entry ?_ "w")))
+#+END_SRC
+
+** Safe variables for dir-locals
+#+BEGIN_SRC emacs-lisp
+  (advice-add 'risky-local-variable-p :override #'ignore)
 #+END_SRC
 
 * Custom functions
@@ -479,7 +491,16 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]. This is a li
         (yank))))
 #+END_SRC
 
-one two one
+** Save buffer even if modified
+#+BEGIN_SRC emacs-lisp
+  (defun gk/save-buffer-always()
+    "Forces save-buffer, even if file is not modified"
+    (interactive)
+    (set-buffer-modified-p t)
+    (save-buffer))
+
+#+END_SRC
+
 * Look options
 ** Theme
 *** Gruvbox
@@ -597,11 +618,11 @@ maybe just code?
   (set-default 'truncate-lines t)
 #+END_SRC
 
-Definitely do wrap the compilation buffer though
+Definitely do wrap the compilation and minibuffer though
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'compilation-mode-hook (lambda () (setq truncate-lines nil)))
-
+  (add-hook 'minibuffer-setup-hook (lambda () (setq truncate-lines nil)))
 #+END_SRC
 
 * Packages
@@ -626,33 +647,22 @@ Company for autocompletion
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :straight t
-    :config
-    (global-company-mode t)
+    :bind (:map company-active-map
+            ("<return>" . nil)
+            ("RET" . nil)
+            ("<tab>" . #'company-complete-common)
+            ("M-<tab>" . #'company-complete-selection)
+            :map prog-mode-map
+            ("<tab>" . #'company-complete))
+     :config
+     (global-company-mode t)
 
-    ; (add-to-list 'company-backends 'company-files)
+    ;; (add-to-list 'company-backends 'company-files)
+    ;; (setq company-backends '(company-capf company-files))
 
-    ; (setq company-backends '(company-capf company-files))
 
+    (add-hook 'text-mode-hook (lambda () (company-mode -1))))
 
-    (add-hook 'text-mode-hook (lambda () (company-mode -1)))
-
-    (setq-default company-idle-delay 0.5)
-
-    ;; Number the candidates (use M-1, M-2 etc to select completions).
-    (setq company-show-numbers t)
-
-    ;; Use the tab-and-go frontend.
-    ;; Allows TAB to select and complete at the same time.
-    (company-tng-configure-default)
-  ;;   (setq company-frontends
-  ;;         '(;; company-tng-frontend
-  ;;           company-pseudo-tooltip-frontend
-  ;;           company-echo-metadata-frontend)))
-
-  ;; (use-package company-box
-  ;;   :straight t
-  ;;   :hook (company-mode . company-box-mode))
-    )
 #+END_SRC
 
 ** Projectile
@@ -837,6 +847,41 @@ For the modeline
     :straight (yasnippet-snippets :type git :host github
                                   :repo "oskarsigvardsson/yasnippet-snippets"))
 #+END_SRC
+
+** undo-tree
+Save persistent history with undo tree
+#+BEGIN_SRC emacs-lisp
+  (setq undo-tree-auto-save-history t)
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+#+END_SRC
+
+** Dash
+#+BEGIN_SRC emacs-lisp
+  (use-package dash-at-point
+    :straight t
+    :config
+    (add-hook 'evil-mode-hook
+              (lambda()
+                (general-define-key
+                 :states 'normal
+                 ",d" 'dash-at-point))))
+#+END_SRC
+
+** realgud/lldb
+#+BEGIN_SRC emacs-lisp
+  (use-package realgud
+    :straight t)
+
+  (use-package realgud-lldb
+    :straight t)
+#+END_SRC
+
+** yaml
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :straight t)
+#+END_SRC
+
 * Helm
 #+BEGIN_SRC emacs-lisp
   (use-package helm
@@ -930,7 +975,7 @@ For the modeline
      "<down>"            'evil-window-down
      "<backspace>"       'evil-ex-nohighlight
      "RET"               'gk/insert-empty-line
-     "z"                 'save-buffer
+     "z"                 'gk/save-buffer-always
      "SPC"               'helm-M-x)
 
     (general-define-key
@@ -1026,6 +1071,11 @@ vii, cii, etc)
                 (evil-indent-plus-default-bindings))))
 #+END_SRC
 
+** Increment/decrement numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-numbers
+    :straight t)
+#+END_SRC
 ** Load it
 #+BEGIN_SRC emacs-lisp
   (use-package evil
@@ -1193,7 +1243,12 @@ mode.
 
 ** Reveal
 #+BEGIN_SRC emacs-lisp
-;;  (use-package ox-reveal :straight t)	
+  (defun load-ox-reveal ()
+    (interactive)
+    "Load ox-reveal and restart org mode"
+
+    (use-package ox-reveal :straight t)
+    (org-reload))
 #+END_SRC
 
 * Languages
@@ -1224,27 +1279,30 @@ mode.
 ** C++
 C/C++ language server
 #+BEGIN_SRC emacs-lisp
- (use-package lsp-mode
-   :straight t
-   :config
+  (use-package lsp-mode
+    :straight t
+    :config
 
-   (use-package company-lsp
-     :straight t
-     :config
-     (add-to-list 'company-backends 'company-lsp))
+    (use-package company-lsp
+      :straight t
+      :config
+      (add-to-list 'company-backends 'company-lsp))
 
-   (use-package flycheck
-     :straight t)
-   ;; (use-package flycheck
-   ;;   :straight t
-   ;;   :config
-     ;; (use-package lsp-ui
-     ;;   :straight t
-     ;;   :config
-     ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
+    (use-package flycheck
+      :straight t)
+    ;; (use-package flycheck
+    ;;   :straight t
+    ;;   :config
+      ;; (use-package lsp-ui
+      ;;   :straight t
+      ;;   :config
+      ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
 
-   (add-hook 'c++-mode-hook #'lsp)
-   (add-hook 'c-mode-hook #'lsp))
+    (add-hook 'c++-mode-hook #'lsp)
+    (add-hook 'c-mode-hook #'lsp)
+  )
+
+  (add-hook 'c++-mode-hook (lambda() (c-set-offset 'inlambda 0)))
 #+END_SRC
 
 ** Shaderlab
@@ -1316,6 +1374,7 @@ inspect luarocks package
 #+END_SRC
 
 ** Scheme
+
 #+BEGIN_SRC emacs-lisp
   (use-package paredit
     :straight t
@@ -1326,6 +1385,30 @@ inspect luarocks package
     :straight t
     :config
     (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
+#+END_SRC
+
+** Swift
+#+BEGIN_SRC emacs-lisp
+  (use-package swift-mode
+    :straight t)
+#+END_SRC
+
+** Meson
+#+BEGIN_SRC emacs-lisp
+  (use-package meson-mode
+    :straight t)
+#+END_SRC
+
+** Powershell
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package powershell-mode
+  ;;   :straight t)
+#+END_SRC
+
+** Raku
+#+BEGIN_SRC emacs-lisp
+  (use-package raku-mode
+    :straight t)
 #+END_SRC
 
 * Cotton stuff
@@ -1353,10 +1436,12 @@ inspect luarocks package
     (end-of-buffer t)
     (auto-revert-tail-mode t))
 #+END_SRC
+
 ** Exclude cotton logs from recentf
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'recentf-exclude ".*Cotton Juce 5 Logs.*")
 #+END_SRC
+
 ** Remove clang from company
 Really slow on cotton files, and it doesn't work anyway. I should find
 a way to fix that...
@@ -1364,6 +1449,7 @@ a way to fix that...
 #+BEGIN_SRC emacs-lisp
   ; (setq company-backends (delete 'company-clang company-backends))
 #+END_SRC
+
 * Start-up
 ** Split window into default buffers
 #+BEGIN_SRC emacs-lisp
@@ -1389,4 +1475,6 @@ a way to fix that...
 
   (default-window-setup)
 #+END_SRC
+
+
 
