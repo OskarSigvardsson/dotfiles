@@ -461,14 +461,22 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]. This is a li
 #+BEGIN_SRC emacs-lisp
   (defun gk/new-buffer (&optional template number)
     (interactive)
-    (let* ((template (or template "new-buffer-%d"))
+    (let* ((template (or template "/tmp/new-buffer-%d"))
            (number (or number 0))
            (name (format template number)))
-      (if (get-buffer name)
+      (if (file-exists-p name)
           (gk/new-buffer template (+ 1 number))
         (progn
           (message (format "Creating new buffer %s" name))
-          (switch-to-buffer (get-buffer-create name))))))
+          (find-file name)))))
+
+  (defun gk/new-buffer-clean (&optional dir template)
+    (interactive)
+    (let* ((template (or template "new-buffer-"))
+           (dir (or dir "/tmp"))
+           (files (directory-files dir t template)))
+      (mapcar #'delete-file files)))
+	
 #+END_SRC
 
 ** Add buffer-local hook
@@ -882,17 +890,70 @@ Save persistent history with undo tree
     :straight t)
 #+END_SRC
 
+* Ivy
+#+BEGIN_SRC emacs-lisp  
+  (use-package flx
+    :straight t)
+
+  (use-package ivy
+    :straight t
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers 1)
+    ;; (setq ivy-height 20)
+    )
+
+  (use-package counsel
+    :straight t
+    :config
+    (counsel-mode 1))
+
+  (use-package ivy-rich
+    :straight t
+    :config (ivy-rich-mode 1))
+
+  (use-package prescient
+    :straight t)
+
+  (use-package ivy-prescient
+    :straight t)
+
+  (use-package ivy-posframe
+    :custom-face
+    (internal-border ((t (:background "#cccccc"))))
+    :straight t
+    :config
+    (setq ivy-posframe-parameters
+          '((left-fringe . 8)
+            (right-fringe . 8))
+          ivy-posframe-border-width 10
+          ivy-posframe-style 'frame-center)
+
+    (setq ivy-posframe-size-function
+          (lambda ()
+            (let ((width (floor (* 0.75 (frame-width))))
+                  (height (floor (* 0.75 (frame-height)))))
+              (list
+               :height height
+               :width width
+               :min-height height
+               :min-width width))))
+
+    (ivy-posframe-mode 1))
+#+END_SRC
+
 * Helm
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :straight t
     :config
 
-    (general-define-key
-     "M-x"     'helm-M-x
-     "C-M-x"   'execute-extended-command
-     "C-h a"   'helm-apropos
-     "C-x b"   'helm-mini)
+    ;; (general-define-key
+    ;;  "M-x"     'helm-M-x
+    ;;  "C-M-x"   'execute-extended-command
+    ;;  "C-h a"   'helm-apropos
+    ;;  "C-x b"   'helm-mini
+    ;; )
 
     (use-package helm-ls-git
       :straight t)
@@ -954,13 +1015,13 @@ Save persistent history with undo tree
     (general-define-key
      :states 'normal
      ",s"                'mark-whole-buffer
-     ",f"                'helm-find-files
-     ",p"                'helm-ls-git-ls
-     ",b"                'helm-mini
+     ",f"                'counsel-find-file
+     ",p"                'counsel-git
+     ",b"                'counsel-switch-buffer
      ",m"                'magit-status
-     ",g"                'helm-rg-git-root  ; defined in helm section
+     ",g"                'counsel-rg
      ",k"                'kill-this-buffer
-     ",h"                'helm-apropos
+     ",h"                'counsel-apro
      ",c"                'gk/kill-number-into-calc
      "√"                 'gk/move-line-down
      "ª"                 'gk/move-line-up
@@ -976,7 +1037,7 @@ Save persistent history with undo tree
      "<backspace>"       'evil-ex-nohighlight
      "RET"               'gk/insert-empty-line
      "z"                 'gk/save-buffer-always
-     "SPC"               'helm-M-x)
+     "SPC"               'counsel-M-x)
 
     (general-define-key
      :states 'visual
@@ -1076,6 +1137,7 @@ vii, cii, etc)
   (use-package evil-numbers
     :straight t)
 #+END_SRC
+
 ** Load it
 #+BEGIN_SRC emacs-lisp
   (use-package evil
@@ -1411,6 +1473,11 @@ inspect luarocks package
     :straight t)
 #+END_SRC
 
+** JSON 
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :straight t)
+#+END_SRC
 * Cotton stuff
 ** Show cotton logs
 #+BEGIN_SRC emacs-lisp

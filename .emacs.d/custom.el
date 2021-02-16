@@ -67,6 +67,24 @@
  '(flycheck-check-syntax-automatically (quote (save idle-buffer-switch mode-enabled)))
  '(helm-buffer-max-length 30)
  '(helm-split-window-default-side (quote right))
+ '(ivy-height 50)
+ '(ivy-height-alist
+   (quote
+	((counsel-evil-registers . 5)
+	 (counsel-yank-pop . 5)
+	 (counsel-git-log . 4)
+	 (counsel-rg . 50))))
+ '(ivy-initial-inputs-alist
+   (quote
+	((counsel-minor . "^+")
+	 (counsel-package . "^+")
+	 (counsel-org-capture . "^")
+	 (org-refile . "^")
+	 (org-agenda-refile . "^")
+	 (org-capture-refile . "^")
+	 (Man-completion-table . "^")
+	 (woman . "^")
+	 (counsel-rg . current-word))))
  '(ledger-reports
    (quote
 	(("bal" "%(binary) -f %(ledger-file) bal")
@@ -136,6 +154,7 @@
  '(ediff-fine-diff-B ((t (:background "#028a02"))))
  '(ediff-fine-diff-C ((t (:background "#129a12"))))
  '(ediff-odd-diff-C ((t (:background "Grey40"))))
+ '(internal-border ((t (:background "#cccccc"))))
  '(line-number ((t (:inherit default :background "#1d2021" :foreground "#7c6f64"))))
  '(minibuffer-prompt ((t (:foreground "#83a598" :weight bold))))
  '(nobreak-space ((t (:inherit escape-glyph :underline nil))))

@@ -2,6 +2,8 @@
 
 set -o errexit -o nounset
 
-emacsclient --alternate-editor "" \
-            --tty \
-            --quiet "$@" 2>/dev/null
+# emacsclient --alternate-editor "" \
+#             --tty \
+#             --quiet "$@" 2>/dev/null
+
+vim "$@"
