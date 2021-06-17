@@ -30,6 +30,8 @@ export PS1=" \[\e[00;36;1m\]λ \W \[\e[0m\]"
 
 alias dfs='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
+[[ -f /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+
 if which fortune > /dev/null 2> /dev/null
 then
     if which cowsay > /dev/null 2> /dev/null
@@ -42,4 +44,3 @@ fi
 
 export PATH="$HOME/.cargo/bin:$PATH"
 export BASH_SILENCE_DEPRECATION_WARNING=1
-eval "$(/opt/homebrew/bin/brew shellenv)"
