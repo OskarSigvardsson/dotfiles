@@ -12,6 +12,7 @@ folder, at the top.
     (setenv "PATH" (concat dir ":" (getenv "PATH"))))
 
   (gk/add-dir-to-path "/usr/local/bin")
+  (gk/add-dir-to-path "/opt/homebrew/bin")
   (gk/add-dir-to-path (concat (getenv "HOME") "/bin"))
 #+END_SRC
 
@@ -82,10 +83,10 @@ Emacs clobbers the clipboard a little too readily, so I'm going to try
 turning the automatic integration off. Still enable it with regular Cmd-C/X/V
 
 #+BEGIN_SRC emacs-lisp
-  (setq select-enable-clipboard nil)
-  (global-set-key (kbd "s-c") 'clipboard-kill-ring-save)
-  (global-set-key (kbd "s-v") 'clipboard-yank)
-  (global-set-key (kbd "s-x") 'clipboard-kill-region)
+   (setq select-enable-clipboard nil)
+   (global-set-key (kbd "s-c") 'clipboard-kill-ring-save)
+   (global-set-key (kbd "s-v") 'clipboard-yank)
+   (global-set-key (kbd "s-x") 'clipboard-kill-region)
 #+END_SRC
 
 ** Make the bell less noisy
@@ -132,8 +133,9 @@ impactful.
 
 #+BEGIN_SRC emacs-lisp
   (setq mac-option-modifier 'meta)
-  (setq mac-right-command-modifier 'meta)
-  (setq mac-right-option-modifier nil)
+  (setq mac-left-option-modifier 'meta)
+  ;; (setq mac-right-command-modifier 'meta)
+  ;; (setq mac-right-option-modifier nil)
 
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
@@ -859,8 +861,6 @@ For the modeline
 ** undo-tree
 Save persistent history with undo tree
 #+BEGIN_SRC emacs-lisp
-  (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
 #+END_SRC
 
 ** Dash
@@ -916,7 +916,9 @@ Save persistent history with undo tree
     :straight t)
 
   (use-package ivy-prescient
-    :straight t)
+    :straight t
+    :config
+    (ivy-prescient-mode t))
 
   (use-package ivy-posframe
     :custom-face
@@ -1134,10 +1136,23 @@ vii, cii, etc)
 
 ** Increment/decrement numbers
 #+BEGIN_SRC emacs-lisp
-  (use-package evil-numbers
-    :straight t)
+  ;; (use-package evil-numbers
+  ;;   :straight t)
 #+END_SRC
 
+** undo-tree
+#+BEGIN_SRC emacs-lisp
+
+  (use-package undo-tree
+    :straight t
+    :config
+    (setq undo-tree-auto-save-history t)
+    (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+    (global-undo-tree-mode 1)
+    (add-hook 'evil-mode-hook
+              (lambda ()
+                (setq evil-undo-system 'undo-tree))))
+#+END_SRC
 ** Load it
 #+BEGIN_SRC emacs-lisp
   (use-package evil
@@ -1158,7 +1173,7 @@ Org mode folders
 #+BEGIN_SRC emacs-lisp
    (setq org-directory           "~/Dropbox (Personal)/Org"
          org-archive-location    "~/Dropbox (Personal)/Org/archive.org::* Archive"
-         org-default-notes-file  "~/Dropbox (Personal)/Org/todo.org"
+         org-default-notes-file  "~/Dropbox (Personal)/Org/work.org"
          org-default-agenda-file "~/Dropbox (Personal)/Org/todo.org"
          org-agenda-files        '("~/Dropbox (Personal)/Org/todo.org")
          org-agenda-window-setup 'current-window)
@@ -1345,10 +1360,8 @@ C/C++ language server
     :straight t
     :config
 
-    (use-package company-lsp
-      :straight t
-      :config
-      (add-to-list 'company-backends 'company-lsp))
+    (when (string-equal system-type "darwin")
+      (setq-default lsp-clients-clangd-executable "/opt/homebrew/opt/llvm/bin/clangd"))
 
     (use-package flycheck
       :straight t)
@@ -1367,6 +1380,10 @@ C/C++ language server
   (add-hook 'c++-mode-hook (lambda() (c-set-offset 'inlambda 0)))
 #+END_SRC
 
+** Objective-C++
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.mm\\'" . c++-mode))
+#+END_SRC
 ** Shaderlab
 #+BEGIN_SRC emacs-lisp
   (use-package shader-mode
@@ -1528,13 +1545,14 @@ a way to fix that...
     (interactive)
     (if (display-graphic-p)
 	(progn
+      (calendar)
 	  (delete-other-windows)
 	  (split-window-right)
 	  (switch-to-buffer "*scratch*")
-	  ;;(find-file org-default-notes-file)
+	  (find-file org-default-notes-file)
 	  (other-window 1 nil)
-  ;;        (org-agenda-list)
-	  (switch-to-buffer "*scratch*")
+      (switch-to-buffer "*Calendar*")
+	  ;;(switch-to-buffer "*scratch*")
 	  (other-window 1 nil))
       (progn
 	(delete-other-windows)
