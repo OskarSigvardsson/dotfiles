@@ -174,6 +174,12 @@ way anyway, it's always either C-x C-c or :q anyway
       (global-set-key (kbd "s-q") (lambda () (interactive) (message "Cmd+Q disabled"))))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<f10>") #'ff-find-other-file)
+#+END_SRC
+
+
+
 ** Use mouse in terminal
 
 #+BEGIN_SRC emacs-lisp
@@ -511,6 +517,15 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]. This is a li
 
 #+END_SRC
 
+** Toggle buffers back and forth
+#+BEGIN_SRC emacs-lisp
+  (defun gk/toggle-buffers () 
+    (interactive)
+    (switch-to-buffer (other-buffer (current-buffer))))
+
+  (global-set-key (kbd "<f9>") #'gk/toggle-buffers)
+#+END_SRC
+
 * Look options
 ** Theme
 *** Gruvbox
@@ -709,8 +724,8 @@ Company for autocompletion
     ;:load-path "~/.emacs.d/extra-packages/ledger-mode"
     :straight t
     :config
-    (when (string-equal system-type "darwin")
-      (setq-default ledger-binary-path "/usr/local/bin/ledger"))
+    ;; (when (string-equal system-type "darwin")
+      ;;(setq-default ledger-binary-path "/usr/local/bin/ledger"))
 
     ;; (add-to-list 'evil-motion-state-modes 'ledger-report-mode)
     ;; (add-to-list 'evil-motion-state-modes 'ledger-reconcile-mode)
@@ -852,10 +867,11 @@ For the modeline
      (yas-global-mode 1))
   ;;   ;(add-to-list 'company-backends 'company-yasnippet))
 
-  (use-package yasnippet-snippets
-    :after yasnippet
-    :straight (yasnippet-snippets :type git :host github
-                                  :repo "oskarsigvardsson/yasnippet-snippets"))
+  ;;(use-package yasnippet-snippets
+  ;;  :after yasnippet
+  ;;  :straight (yasnippet-snippets :type git :host github
+  ;;                                :repo "oskarsigvardsson/yasnippet-snippets"))
+
 #+END_SRC
 
 ** undo-tree
@@ -1021,7 +1037,7 @@ Save persistent history with undo tree
      ",p"                'counsel-git
      ",b"                'counsel-switch-buffer
      ",m"                'magit-status
-     ",g"                'counsel-rg
+     ",g"                (lambda () (interactive) (counsel-rg (current-word)))
      ",k"                'kill-this-buffer
      ",h"                'counsel-apro
      ",c"                'gk/kill-number-into-calc
@@ -1375,6 +1391,9 @@ C/C++ language server
 
     (add-hook 'c++-mode-hook #'lsp)
     (add-hook 'c-mode-hook #'lsp)
+
+    (use-package lsp-ui
+      :straight t)
   )
 
   (add-hook 'c++-mode-hook (lambda() (c-set-offset 'inlambda 0)))
@@ -1384,6 +1403,7 @@ C/C++ language server
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.mm\\'" . c++-mode))
 #+END_SRC
+
 ** Shaderlab
 #+BEGIN_SRC emacs-lisp
   (use-package shader-mode
@@ -1460,10 +1480,16 @@ inspect luarocks package
     :config
     (add-hook 'scheme-mode-hook 'paredit-mode))
 
-  (use-package evil-cleverparens
-    :straight t
-    :config
-    (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
+  ;; (use-package evil-cleverparens
+  ;;   :straight t
+  ;;   :config
+  ;;   (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
+
+  (use-package lispy
+    :straight t)
+
+  (use-package evil-lispy
+    :straight t)
 #+END_SRC
 
 ** Swift
@@ -1495,6 +1521,16 @@ inspect luarocks package
   (use-package json-mode
     :straight t)
 #+END_SRC
+
+** Rust
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :straight t
+    :config 
+    (gk/add-dir-to-path (concat (getenv "HOME") "/.cargo/bin"))
+    (add-hook 'rust-mode-hook #'lsp))
+#+END_SRC
+
 * Cotton stuff
 ** Show cotton logs
 #+BEGIN_SRC emacs-lisp
