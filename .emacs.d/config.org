@@ -472,7 +472,7 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]. This is a li
     (let* ((template (or template "/tmp/new-buffer-%d"))
            (number (or number 0))
            (name (format template number)))
-      (if (file-exists-p name)
+      (if (or (file-exists-p name) (not (eq nil (get-buffer name))))
           (gk/new-buffer template (+ 1 number))
         (progn
           (message (format "Creating new buffer %s" name))
@@ -484,7 +484,7 @@ From [[https://stackoverflow.com/a/384346/220961][stack overflow]]. This is a li
            (dir (or dir "/tmp"))
            (files (directory-files dir t template)))
       (mapcar #'delete-file files)))
-	
+
 #+END_SRC
 
 ** Add buffer-local hook
@@ -674,9 +674,12 @@ Company for autocompletion
     :straight t
     :bind (:map company-active-map
             ("<return>" . nil)
-            ("RET" . nil)
-            ("<tab>" . #'company-complete-common)
-            ("M-<tab>" . #'company-complete-selection)
+            ("RET"      . nil)
+            ("<tab>"    . #'company-complete-selection)
+            ("M-<tab>"  . #'company-complete-common)
+            ("C-j"      . #'company-select-next)
+            ("C-k"      . #'company-select-previous)
+            ("M-<tab>"  . #'company-complete-common)
             :map prog-mode-map
             ("<tab>" . #'company-complete))
      :config
@@ -687,6 +690,11 @@ Company for autocompletion
 
 
     (add-hook 'text-mode-hook (lambda () (company-mode -1))))
+
+  (use-package company-box
+    :straight t
+    :hook (company-mode . company-box-mode))
+  
 
 #+END_SRC
 
@@ -922,7 +930,8 @@ Save persistent history with undo tree
   (use-package counsel
     :straight t
     :config
-    (counsel-mode 1))
+    ;; (counsel-mode 1)
+    )
 
   (use-package ivy-rich
     :straight t
@@ -1035,7 +1044,7 @@ Save persistent history with undo tree
      ",s"                'mark-whole-buffer
      ",f"                'counsel-find-file
      ",p"                'counsel-git
-     ",b"                'counsel-switch-buffer
+     ",b"                'ivy-switch-buffer
      ",m"                'magit-status
      ",g"                (lambda () (interactive) (counsel-rg (current-word)))
      ",k"                'kill-this-buffer
@@ -1048,10 +1057,6 @@ Save persistent history with undo tree
      "+"                 'flycheck-next-error
      "-"                 'flycheck-previous-error
      "<deletechar>"      'clear-line
-     "<left>"            'evil-window-left
-     "<right>"           'evil-window-right
-     "<up>"              'evil-window-up
-     "<down>"            'evil-window-down
      "<backspace>"       'evil-ex-nohighlight
      "RET"               'gk/insert-empty-line
      "z"                 'gk/save-buffer-always
@@ -1528,7 +1533,15 @@ inspect luarocks package
     :straight t
     :config 
     (gk/add-dir-to-path (concat (getenv "HOME") "/.cargo/bin"))
-    (add-hook 'rust-mode-hook #'lsp))
+    (add-hook 'rust-mode-hook #'lsp)
+    (add-hook 'rust-mode-hook (lambda () (setq indent-tabs-mode nil))))
+#+END_SRC
+
+** Nix
+#+BEGIN_SRC emacs-lisp
+    (use-package nix-mode
+      :straight t
+      :config (setq nix-indent-function 'smie-indent-line))
 #+END_SRC
 
 * Cotton stuff
@@ -1536,7 +1549,7 @@ inspect luarocks package
 #+BEGIN_SRC emacs-lisp
   (defun gk/cotton-directory ()
     (if (string-equal system-type "darwin")
-        "/Users/oskar.sigvardsson/Desktop/Cotton Juce 5 Logs/"
+        (concat (getenv "HOME") "/Desktop/Cotton Juce 5 Logs/")
         "/mnt/c/Users/Oskar Sigvardsson/Desktop/Cotton Juce 5 Logs/"))
 
   (defun gk/latest-cotton-log-file ()
@@ -1554,6 +1567,7 @@ inspect luarocks package
     (find-file (gk/latest-cotton-log-file))
     (read-only-mode t)
     (end-of-buffer t)
+    (set-buffer-file-coding-system "DOS")
     (auto-revert-tail-mode t))
 #+END_SRC
 
@@ -1585,10 +1599,10 @@ a way to fix that...
 	  (delete-other-windows)
 	  (split-window-right)
 	  (switch-to-buffer "*scratch*")
-	  (find-file org-default-notes-file)
+	  ;;(find-file org-default-notes-file)
 	  (other-window 1 nil)
       (switch-to-buffer "*Calendar*")
-	  ;;(switch-to-buffer "*scratch*")
+	  (switch-to-buffer "*scratch*")
 	  (other-window 1 nil))
       (progn
 	(delete-other-windows)
