@@ -26,27 +26,30 @@ setopt HIST_FIND_NO_DUPS
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-em()
-{
-	args=""
+if [[ $(uname) == "Darwin" ]]; then
+	em()
+	{
+		args=""
 
-	if [[ -t 0 ]]; then
-		if [[ "$#" -gt "0" ]]; then
-			emacsclient -n "$1"
+		if [[ -t 0 ]]; then
+			if [[ "$#" -gt "0" ]]; then
+				emacsclient -n "$1"
+			fi
+		else
+			TMP="$(mktemp /tmp/emacsstdin-XXX)"
+			cat >$TMP
+			emacsclient --eval '(let ((b (generate-new-buffer "*stdin*"))) (switch-to-buffer b) (insert-file-contents "'${TMP}'") (delete-file "'${TMP}'"))'
 		fi
-	else
-		TMP="$(mktemp /tmp/emacsstdin-XXX)"
-		cat >$TMP
-		emacsclient --eval '(let ((b (generate-new-buffer "*stdin*"))) (switch-to-buffer b) (insert-file-contents "'${TMP}'") (delete-file "'${TMP}'"))'
-	fi
 
-	emacsclient --eval "(x-focus-frame nil)" > /dev/null
-}
+		emacsclient --eval "(x-focus-frame nil)" > /dev/null
+	}
 
-export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR=/opt/homebrew/share/zsh-syntax-highlighting/highlighters
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR=/opt/homebrew/share/zsh-syntax-highlighting/highlighters
+	source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-eval "$(direnv hook zsh)"
+	eval "$(direnv hook zsh)"
+fi
+
 
 if which fortune > /dev/null 2> /dev/null
 then
