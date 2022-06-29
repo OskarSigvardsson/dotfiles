@@ -1209,7 +1209,7 @@ Initialize babel (do i need to do this?)
      (emacs-lisp . t)
      (gnuplot . t)
      (python . t)
-     (ledger . t)
+     ;; (ledger . t)
      (shell . t)))
 #+END_SRC
 
