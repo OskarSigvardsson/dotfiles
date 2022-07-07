@@ -9,7 +9,6 @@ alias rd=". ranger"
 alias d='cd $(fd --type directory | fzf)'
 alias lgr='ledger -y "%Y-%m-%d" -f "$HOME/Dropbox (Personal)/Ledger/ledger.ledger"'
 
-PROMPT='%B%F{14} λ %c %(?.%F{14}.%F{9})❯ %f%b'
 
 alias dfs='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
@@ -26,7 +25,10 @@ setopt HIST_FIND_NO_DUPS
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+PROMPT_CHAR='π'
+
 if [[ $(uname) == "Darwin" ]]; then
+	PROMPT_CHAR='λ'
 	em()
 	{
 		args=""
@@ -49,6 +51,8 @@ if [[ $(uname) == "Darwin" ]]; then
 
 	eval "$(direnv hook zsh)"
 fi
+
+PROMPT="%B%F{14} $PROMPT_CHAR %c %(?.%F{14}.%F{9})❯ %f%b"
 
 
 if which fortune > /dev/null 2> /dev/null
