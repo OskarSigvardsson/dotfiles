@@ -25,6 +25,11 @@ setopt HIST_FIND_NO_DUPS
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+if type direnv
+then
+	eval "$(direnv hook zsh)"
+fi
+
 PROMPT_CHAR='π'
 
 if [[ $(uname) == "Darwin" ]]; then
@@ -52,7 +57,11 @@ if [[ $(uname) == "Darwin" ]]; then
 	eval "$(direnv hook zsh)"
 fi
 
-PROMPT="%B%F{14} $PROMPT_CHAR %c %(?.%F{14}.%F{9})❯ %f%b"
+if [[ $TERM == "dumb" ]]; then
+    export PS1="$ "
+else
+	PROMPT="%B%F{14} $PROMPT_CHAR %c %(?.%F{14}.%F{9})❯ %f%b"
+fi
 
 
 if which fortune > /dev/null 2> /dev/null
