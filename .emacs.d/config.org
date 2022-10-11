@@ -26,40 +26,6 @@ loaded, so do it pretty early here.
     (setq evil-want-C-i-jump nil))
 #+END_SRC
 
-** WSL handling
-Set a a special variable to indicate that we're on WSL. It is detected
-by checking if the folder "/mnt/c" exists. Also creates c:/emacs
-directory for emacs communication
-
-UPDATE: i don't use WSL any more so lets comment out this section
-
-#+BEGIN_SRC emacs-lisp
-  ;; (setq emacs-on-wsl (file-directory-p "/mnt/c"))
-  ;; (setq emacs-wsl-directory "/mnt/c/emacs")
-
-  ;; (when emacs-on-wsl (make-directory emacs-wsl-directory t))
-
-  ;; (defun gk/emacs-wsl-delete-server-file ()
-  ;;   "Delete the server file from windows"
-  ;;   (delete-file (gk/emacs-wsl-server-file)))
-
-  ;; (defun gk/emacs-wsl-server-file ()
-  ;;   "The file containing server details on WSL"
-  ;;   (concat (file-name-as-directory emacs-wsl-directory) "server"))
-
-  ;; (defun gk/emacs-wsl-copy-server-file ()
-  ;;   "Copy the server file from WSL to windows. Used in server-mode-hook"
-  ;;   (let ((source (concat (file-name-as-directory server-auth-dir) "server"))
-  ;;         (destination (gk/emacs-wsl-server-file)))
-  ;;     (if server-mode (copy-file source destination t) (gk/emacs-wsl-delete-server-file))))
-
-  ;; (when emacs-on-wsl
-  ;;   (setq server-use-tcp t)
-
-  ;;   (add-hook 'server-mode-hook 'gk/emacs-wsl-copy-server-file)
-  ;;   (add-hook 'kill-emacs-hook 'gk/emacs-wsl-delete-server-file))
-#+END_SRC
-
 ** Start server
 Start the server so that you can use emacsclient. To edit a file from
 the terminal use `emacs-edit`
@@ -70,7 +36,6 @@ the terminal use `emacs-edit`
 #+END_SRC
 
 ** Custom file
-
 Don't want the custom file polluting the main config file
 
 #+BEGIN_SRC emacs-lisp
@@ -178,53 +143,10 @@ way anyway, it's always either C-x C-c or :q anyway
   (global-set-key (kbd "<f10>") #'ff-find-other-file)
 #+END_SRC
 
-
-
 ** Use mouse in terminal
-
 #+BEGIN_SRC emacs-lisp
   (unless (display-graphic-p)
     (xterm-mouse-mode 1))
-#+END_SRC
-
-** Swap swedish keys for control characters
-I should make this into a minor mode...
-
-#+BEGIN_SRC emacs-lisp
-   (defun gk/swap-keys (k1 k2)
-     "Swap two keys on a low level"
-     (keyboard-translate k1 k2)
-     (keyboard-translate k2 k1))
-
-  (define-minor-mode swedish-keyswap-mode
-    "A minor mode that swaps swedish keys for more useful programming keys"
-    :global t
-    (cond (swedish-keyswap-mode
-        (progn
-          (gk/swap-keys ?ö ?\{)
-          (gk/swap-keys ?ä ?\})
-          (gk/swap-keys ?Ö ?\[)
-          (gk/swap-keys ?Ä ?\])
-          (gk/swap-keys ?å ?^)
-          (gk/swap-keys ?Å ?$)))
-       (t
-      (progn
-        (keyboard-translate ?ö ?ö)
-        (keyboard-translate ?ä ?ä)
-        (keyboard-translate ?Ö ?Ö)
-        (keyboard-translate ?Ä ?Ä)
-        (keyboard-translate ?å ?å)
-        (keyboard-translate ?Å ?Å)
-        (keyboard-translate ?\{ ?\{)
-        (keyboard-translate ?\} ?\})
-        (keyboard-translate ?\[ ?\[)
-        (keyboard-translate ?\] ?\])
-        (keyboard-translate ?^ ?^)
-        (keyboard-translate ?$ ?$)))))
-
-   ;; (when (display-graphic-p)
-   ;;   (swedish-keyswap-mode 1))
-
 #+END_SRC
 
 ** Scroll options
@@ -243,6 +165,7 @@ The default value is insanity.
 #+END_SRC
 
 ** Fix whitespace before saving
+UPDATE: disabled because of XLN Audio
 #+BEGIN_SRC emacs-lisp
   ; (add-hook
   ;  'before-save-hook
@@ -250,15 +173,6 @@ The default value is insanity.
   ;    (when (and (bound-and-true-p evil-mode) (evil-normal-state-p))
   ;      (delete-trailing-whitespace))))
 #+END_SRC
-
-*** DONE don't do this if we're in insert state
-This combined with "save with defocus has a problem, which is that if
-you're in insert state on an empty indented line, ready to start
-typing but you switch focus, the indentation disappears (because when
-you defocus, it saves, and when it saves, it removes trailing
-whitespace)
-
-FIXED: only fix whitespace on defocus when you're in evil-normal-state
 
 ** Save on defocus
 Save all file-tracking buffers on defocus. Neat!
@@ -283,14 +197,12 @@ whatever.
 #+END_SRC
 
 ** Tab settings
-Tabs are 4 characters, c offset is 4, and replace tabs with spaces by
-default.
+Tabs are 4 characters, c offset is 4, use tabs for indentation (grumble grumble XLN).
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default
-   tab-width        4
-   c-basic-offset   4
-   indent-tabs-mode t)
+  (setq-default tab-width        4)
+  (setq-default c-basic-offset   4)
+  ;; (setq-default indent-tabs-mode t)
 #+END_SRC
 
 ** Compile/recompile with F5
@@ -409,18 +321,6 @@ normal state.
     (if-let ((face (gk/face-at-position pos)))
         (customize-face face)
       (message "Can't find face under cursor")))
-
-#+END_SRC
-
-** Compile with make
-Run compile with makefile in first ancestor directory with one in it.
-
-#+BEGIN_SRC emacs-lisp
-  (defun gk/compile-with-make ()
-    "Get folder containing makefile, upwards in hierarchy"
-    (interactive)
-    (compile (format "make -C %s" (locate-dominating-file "." "Makefile"))))
-
 
 #+END_SRC
 
@@ -557,9 +457,7 @@ The most important setting of all!
 
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'default nil :height 200 :foundry "Matt" :family "Triplicate T4c")
-  ;; (set-face-attribute 'default nil :height 220 :weight 'thin :foundry "Matt" :family "Operator Mono")
 #+END_SRC
-
 
 Use italics and bold more liberally.
 
@@ -617,7 +515,6 @@ Highlight current line
 #+END_SRC
 
 Start maximized
-
 #+BEGIN_SRC emacs-lisp
   (toggle-frame-maximized)
 #+END_SRC
@@ -648,6 +545,14 @@ Definitely do wrap the compilation and minibuffer though
 #+BEGIN_SRC emacs-lisp
   (add-hook 'compilation-mode-hook (lambda () (setq truncate-lines nil)))
   (add-hook 'minibuffer-setup-hook (lambda () (setq truncate-lines nil)))
+#+END_SRC
+
+** Indent guides
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-indent-guides
+    :straight t
+    :config
+    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 #+END_SRC
 
 * Packages
@@ -718,7 +623,6 @@ Company for autocompletion
 #+END_SRC
 
 ** which-key
-
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
      :straight t
@@ -930,12 +834,13 @@ Save persistent history with undo tree
   (use-package counsel
     :straight t
     :config
-    ;; (counsel-mode 1)
-    )
+    (counsel-mode 1))
 
   (use-package ivy-rich
     :straight t
-    :config (ivy-rich-mode 1))
+    :config
+    (ivy-rich-mode 1)
+    (setq ivy-rich-parse-remote-buffer nil))
 
   (use-package prescient
     :straight t)
@@ -945,28 +850,28 @@ Save persistent history with undo tree
     :config
     (ivy-prescient-mode t))
 
-  (use-package ivy-posframe
-    :custom-face
-    (internal-border ((t (:background "#cccccc"))))
-    :straight t
-    :config
-    (setq ivy-posframe-parameters
-          '((left-fringe . 8)
-            (right-fringe . 8))
-          ivy-posframe-border-width 10
-          ivy-posframe-style 'frame-center)
+  ;; (use-package ivy-posframe
+  ;;   :custom-face
+  ;;   (internal-border ((t (:background "#cccccc"))))
+  ;;   :straight t
+  ;;   :config
+  ;;   (setq ivy-posframe-parameters
+  ;;         '((left-fringe . 8)
+  ;;           (right-fringe . 8))
+  ;;         ivy-posframe-border-width 10
+  ;;         ivy-posframe-style 'frame-center)
 
-    (setq ivy-posframe-size-function
-          (lambda ()
-            (let ((width (floor (* 0.75 (frame-width))))
-                  (height (floor (* 0.75 (frame-height)))))
-              (list
-               :height height
-               :width width
-               :min-height height
-               :min-width width))))
+  ;;   (setq ivy-posframe-size-function
+  ;;         (lambda ()
+  ;;           (let ((width (floor (* 0.75 (frame-width))))
+  ;;                 (height (floor (* 0.75 (frame-height)))))
+  ;;             (list
+  ;;              :height height
+  ;;              :width width
+  ;;              :min-height height
+  ;;              :min-width width))))
 
-    (ivy-posframe-mode 1))
+  ;;   (ivy-posframe-mode 1))
 #+END_SRC
 
 * Helm
@@ -1174,6 +1079,7 @@ vii, cii, etc)
               (lambda ()
                 (setq evil-undo-system 'undo-tree))))
 #+END_SRC
+
 ** Load it
 #+BEGIN_SRC emacs-lisp
   (use-package evil

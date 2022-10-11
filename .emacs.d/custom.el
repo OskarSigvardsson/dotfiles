@@ -67,6 +67,7 @@
  '(flycheck-check-syntax-automatically '(save idle-buffer-switch mode-enabled))
  '(helm-buffer-max-length 30)
  '(helm-split-window-default-side 'right)
+ '(highlight-indent-guides-method 'bitmap)
  '(ivy-height 50)
  '(ivy-height-alist
    '((counsel-evil-registers . 5)
