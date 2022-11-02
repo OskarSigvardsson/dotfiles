@@ -16,6 +16,13 @@ folder, at the top.
   (gk/add-dir-to-path (concat (getenv "HOME") "/bin"))
 #+END_SRC
 
+** Env vars
+Perl keeps complaining about locale, so set this:
+
+#+BEGIN_SRC emacs-lisp
+  (setenv "LANG" "en_US.UTF-8")
+#+END_SRC
+
 ** Evil/org-mode setting
 This setting is necessary to make evil/org work together in a terminal
 successfully. It needs to be set before any part of evil-mode is
@@ -1391,10 +1398,10 @@ inspect luarocks package
     :config
     (add-hook 'scheme-mode-hook 'paredit-mode))
 
-  ;; (use-package evil-cleverparens
-  ;;   :straight t
-  ;;   :config
-  ;;   (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
+  (use-package evil-cleverparens
+    :straight t
+    :config
+    (add-hook 'scheme-mode-hook 'evil-cleverparens-mode))
 
   (use-package lispy
     :straight t)

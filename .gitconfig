@@ -1,7 +1,7 @@
 # This is Git's per-user configuration file.
 [user]
 	name = Oskar Sigvardsson
-	email = oskarsigvardsson@gmail.com
+	email = oskar.sigvardsson@xlnaudio.com
 
 [core]
 	excludesfile = /Users/oskar.sigvardsson/.gitignore_global
