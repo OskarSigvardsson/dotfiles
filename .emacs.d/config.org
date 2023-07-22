@@ -104,10 +104,10 @@ Right Cmd is meta, option is just option. Remapping escape to be more
 impactful.
 
 #+BEGIN_SRC emacs-lisp
-  (setq mac-option-modifier 'meta)
+  (setq-default mac-command-key-is-meta nil)
   (setq mac-left-option-modifier 'meta)
-  ;; (setq mac-right-command-modifier 'meta)
-  ;; (setq mac-right-option-modifier nil)
+  (setq mac-right-command-modifier 'meta)
+  (setq mac-right-option-modifier nil)
 
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
@@ -491,7 +491,7 @@ hard-set these headlines to be regular weight and slant.
 #+END_SRC
 
 ** GUI
-No toolbar or scrollbar. Maybe no fringe?
+No toolbar or scrollbar or frame border. Maybe no fringe?
 
 #+BEGIN_SRC emacs-lisp
   (tool-bar-mode -1)
@@ -500,6 +500,7 @@ No toolbar or scrollbar. Maybe no fringe?
 
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark)) 
+  (add-to-list 'default-frame-alist '(internal-border-width . 0)) 
 #+END_SRC
 
 Enable relative line numbers
@@ -556,10 +557,10 @@ Definitely do wrap the compilation and minibuffer though
 
 ** Indent guides
 #+BEGIN_SRC emacs-lisp
-  (use-package highlight-indent-guides
-    :straight t
-    :config
-    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+  ;; (use-package highlight-indent-guides
+  ;;   :straight t
+  ;;   :config
+  ;;   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 #+END_SRC
 
 * Packages
@@ -622,8 +623,12 @@ Company for autocompletion
 ** Magit
 
 #+BEGIN_SRC emacs-lisp
+  (use-package compat
+    :straight t)
+
   (use-package magit
     :straight t
+    :after compat
     :config
     (setq magit-no-confirm '(stage-all-changes unstage-all-changes))
     (add-to-list 'magit-section-initial-visibility-alist '(stashes . hide)))
@@ -825,6 +830,14 @@ Save persistent history with undo tree
     :straight t)
 #+END_SRC
 
+** emacs-direnv
+#+BEGIN_SRC emacs-lisp
+    (use-package direnv
+      :straight t
+      :config
+      (direnv-mode)
+  (advice-add 'lsp :before #'direnv-update-environment))
+#+END_SRC
 * Ivy
 #+BEGIN_SRC emacs-lisp  
   (use-package flx
@@ -1091,11 +1104,17 @@ vii, cii, etc)
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     :straight t
+    :init
+    (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+    (setq evil-want-keybinding nil)
     :config
+    (evil-mode 1))
 
-	(use-package evil-magit :straight t)
-    
-(evil-mode t))
+  (use-package evil-collection
+    :after evil
+    :straight t
+    :config
+    (evil-collection-init))
 #+END_SRC
 
 * Org mode
@@ -1105,12 +1124,15 @@ vii, cii, etc)
 
 Org mode folders
 #+BEGIN_SRC emacs-lisp
-   (setq org-directory           "~/Dropbox (Personal)/Org"
-         org-archive-location    "~/Dropbox (Personal)/Org/archive.org::* Archive"
-         org-default-notes-file  "~/Dropbox (Personal)/Org/work.org"
-         org-default-agenda-file "~/Dropbox (Personal)/Org/todo.org"
-         org-agenda-files        '("~/Dropbox (Personal)/Org/todo.org")
-         org-agenda-window-setup 'current-window)
+  (setq
+   ;; org-directory           "~/Dropbox (Personal)/Org"
+   ;; org-archive-location    "~/Dropbox (Personal)/Org/archive.org::* Archive"
+   org-default-index-file  "~/Nextcloud/nas/Org/index.org"
+   ;; org-default-notes-file  "~/Dropbox (Personal)/Org/work.org"
+   ;; org-default-agenda-file "~/Dropbox (Personal)/Org/todo.org"
+   ;; org-agenda-files        '("~/Dropbox (Personal)/Org/todo.org")
+   ;; org-agenda-window-setup 'current-window
+   )
 #+END_SRC
 
 Initialize babel (do i need to do this?)
@@ -1180,7 +1202,7 @@ Better evil integration
 
 Don't evil-autoindent in org
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'org-mode-hook (lambda () (setq evil-auto-indent nil)))
+  ;; (add-hook 'org-mode-hook (lambda () (setq evil-auto-indent nil)))
 #+END_SRC
 
 Alt+j/k moves lines in evil mode, in org mode it moves headings
@@ -1408,6 +1430,8 @@ inspect luarocks package
 
   (use-package evil-lispy
     :straight t)
+
+  (add-hook 'scheme-mode-hook (lambda () (setq indent-tabs-mode nil)))
 #+END_SRC
 
 ** Swift
@@ -1455,6 +1479,12 @@ inspect luarocks package
     (use-package nix-mode
       :straight t
       :config (setq nix-indent-function 'smie-indent-line))
+#+END_SRC
+
+** Zig
+#+BEGIN_SRC emacs-lisp
+    (use-package zig-mode
+      :straight t)
 #+END_SRC
 
 * Cotton stuff
@@ -1512,7 +1542,7 @@ a way to fix that...
 	  (delete-other-windows)
 	  (split-window-right)
 	  (switch-to-buffer "*scratch*")
-	  ;;(find-file org-default-notes-file)
+	  (find-file org-default-index-file)
 	  (other-window 1 nil)
       (switch-to-buffer "*Calendar*")
 	  (switch-to-buffer "*scratch*")
