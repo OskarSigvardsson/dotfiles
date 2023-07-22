@@ -151,7 +151,8 @@
  '(telephone-line-modified-text " ")
  '(undo-tree-enable-undo-in-region nil)
  '(vdiff-disable-folding t)
- '(zig-format-on-save nil))
+ '(zig-format-on-save nil)
+ '(warning-suppress-types '((comp) (comp) (comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
